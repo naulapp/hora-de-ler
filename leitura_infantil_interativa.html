@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f8f2">
+  <meta name="description" content="Atividades de leitura para crianças: histórias curtas, perguntas e correção interativa. Funciona sem internet.">
+  <title>Hora de Ler | Leitura Infantil</title>
+  <style>
+    :root {
+      --bg: #f8f8f2; --surface: #ffffff; --ink: #22313a; --muted: #61717c;
+      --blue: #285f82; --blue-dark: #194662; --pale: #eaf3f8;
+      --line: #dee6e9; --green: #237a53; --green-pale: #e8f6ee;
+      --red: #ac4947; --red-pale: #fff0ee; --yellow: #f5df9d;
+      --shadow: 0 16px 38px rgba(33, 55, 64, .075);
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; min-height: 100vh; font-family: Verdana, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+    button { font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    button:focus-visible { outline: 3px solid #db9747; outline-offset: 3px; }
+    .wrap { width: min(930px, calc(100% - 38px)); margin: auto; }
+    .topbar { background: rgba(255,255,255,.92); border-bottom: 1px solid var(--line); }
+    .topbar-inner { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 13px; text-align: left; }
+    .brand-icon { display: grid; place-items: center; background: #e6f1eb; color: #276647; border-radius: 16px; width: 47px; height: 47px; font-weight: 900; font-size: 25px; }
+    .brand strong { display: block; font-size: 20px; letter-spacing: -.7px; }
+    .brand small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .mini-btn { background: transparent; color: var(--blue); border: 1px solid var(--line); padding: 11px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; }
+    main { padding: 29px 0 70px; }
+    .eyebrow { color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    h1 { font-size: clamp(26px, 4.3vw, 39px); line-height: 1.15; letter-spacing: -1.3px; margin: 9px 0 12px; }
+    .intro { font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 650px; margin: 0 0 22px; }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 15px; }
+    .lesson { text-align: left; background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 20px; min-height: 198px; transition: border-color .15s, transform .15s; display: flex; flex-direction: column; align-items: flex-start; }
+    .lesson:hover { border-color: #8bb3c6; transform: translateY(-2px); }
+    .lesson-art { width: 58px; height: 58px; border-radius: 15px; display: grid; place-items: center; font-size: 34px; background: #ecf5f1; margin-bottom: 16px; }
+    .lesson:nth-child(2) .lesson-art { background: #e8f2fb; }
+    .lesson:nth-child(3) .lesson-art { background: #f7ebdc; }
+    .lesson-name { font-size: 19px; font-weight: 800; line-height: 1.35; }
+    .lesson-meta { color: var(--muted); font-size: 12px; margin-top: 7px; }
+    .lesson-score { color: var(--green); font-weight: 700; font-size: 13px; margin-top: auto; padding-top: 13px; }
+    .note { margin-top: 20px; padding: 16px 18px; background: #f1f2ea; border-radius: 14px; font-size: 13px; color: #55636b; line-height: 1.6; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: clamp(20px, 4.5vw, 42px); }
+    .stage-head { display: flex; gap: 14px; justify-content: space-between; align-items: center; margin-bottom: 19px; }
+    .stage-kicker { font-size: 13px; color: var(--muted); font-weight: 700; }
+    .stage-title { font-size: clamp(25px, 4.4vw, 34px); letter-spacing: -.8px; margin: 8px 0 12px; }
+    .divider { height: 1px; background: var(--line); margin: 21px 0 25px; }
+    .story-lines { display: flex; flex-direction: column; gap: 14px; margin: 24px 0 31px; }
+    .story-line { display: flex; align-items: baseline; gap: 15px; border: 1px solid #e7ecec; border-radius: 15px; padding: 15px 18px; background: #fcfdfa; line-height: 1.5; }
+    .story-line .line-num { flex: 0 0 26px; color: #9aa9ac; font-size: 14px; font-weight: 700; text-align: center; }
+    .story-line .line-text { font-size: var(--reading-size, 32px); font-weight: 600; letter-spacing: .4px; overflow-wrap: anywhere; }
+    .story-line.active { background: #fff8e8; border-color: #dfc676; }
+    .read-tools { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .sizes { display:flex; gap: 8px; align-items:center; color:var(--muted); font-size: 13px; font-weight: 700; }
+    .size-btn { display: grid; place-items: center; width: 45px; height: 45px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 800; color: var(--blue); }
+    .button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin-top: 25px; }
+    .primary { border: 0; background: var(--blue); color: white; padding: 17px 23px; border-radius: 15px; font-size: 17px; font-weight: 800; min-height: 56px; }
+    .primary:hover { background: var(--blue-dark); }
+    .primary:disabled { background: #9cb2bf; cursor: not-allowed; }
+    .secondary { border: 1px solid #cddbe1; color: var(--blue-dark); background: #fff; padding: 16px 21px; border-radius: 15px; min-height: 56px; font-weight: 800; font-size: 15px; }
+    .helper { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .quiz-progress { display: flex; align-items: center; gap: 14px; margin: 0 0 23px; }
+    .progress-track { background: #e5edef; border-radius: 999px; overflow: hidden; height: 9px; flex: 1; }
+    .progress-track span { background: #64a4b4; height: 100%; display: block; border-radius: inherit; transition: width .2s; }
+    .progress-label { color: var(--muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .question { font-weight: 800; font-size: clamp(26px, 4.8vw, 36px); line-height: 1.52; letter-spacing: -.3px; margin: 10px 0 25px; }
+    .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .answer { text-align: center; display:flex; align-items:center; justify-content:center; min-height: 102px; border-radius: 18px; border: 2px solid #cfdbdf; background: #fff; color: var(--ink); font-size: clamp(21px,3.4vw,27px); font-weight: 800; padding: 16px 11px; line-height: 1.3; }
+    .answer.selected { border-color: #2779a5; background: var(--pale); box-shadow: inset 0 0 0 1px #2779a5; }
+    .answer:hover { border-color: #70a2bd; }
+    .text-toggle { border: none; background: #edf4f6; border-radius: 12px; padding: 12px 16px; color: var(--blue); font-weight: 800; font-size: 14px; }
+    .reference { margin-top: 18px; padding: 17px 20px; background: #f7f9f6; border: 1px solid var(--line); border-radius: 14px; }
+    .reference p { font-size: 18px; line-height: 1.5; font-weight: 650; margin: 10px 0; }
+    .results-head { text-align: center; }
+    .result-icon { width: 82px; height: 82px; margin: 0 auto 15px; background: #ecf6ec; color: #2b764e; border-radius: 50%; display: grid; place-items: center; font-size: 42px; }
+    .result-number { font-size: clamp(30px,5.3vw,43px); font-weight: 900; margin: 10px 0 5px; }
+    .result-comment { color: var(--muted); font-size: 16px; line-height: 1.5; margin-bottom: 26px; }
+    .result-list { display: grid; gap: 10px; margin-top: 24px; }
+    .result-item { display: flex; gap: 13px; align-items: flex-start; border-radius: 13px; border: 1px solid var(--line); padding: 14px 16px; }
+    .result-item.good { background: var(--green-pale); border-color: #d0e7d8; }
+    .result-item.bad { background: var(--red-pale); border-color: #f3d8d3; }
+    .status-dot { display: grid; place-items:center; width: 28px; height: 28px; border-radius:50%; background:#fff; flex:0 0 28px; font-weight: 900; }
+    .good .status-dot { color: var(--green); } .bad .status-dot { color: var(--red); }
+    .result-item strong { display: block; margin-bottom: 6px; font-size: 15px; line-height: 1.5; }
+    .result-item small { font-size: 14px; line-height: 1.55; color: #42505a; }
+    .footer { color: #7e8c90; text-align: center; font-size: 12px; padding: 15px; }
+    @media(max-width: 720px) {
+      .cards { grid-template-columns: 1fr; }
+      .lesson { min-height: 0; display: grid; grid-template-columns: 66px 1fr; column-gap: 14px; align-items: center; padding: 15px; }
+      .lesson-art { grid-row: span 3; margin-bottom: 0; }
+      .lesson-score { padding-top: 5px; }
+      .story-line { padding: 13px 11px; gap: 8px; }
+      .story-line .line-text { font-size: min(var(--reading-size, 32px), 8vw); }
+      .answer { min-height: 96px; }
+    }
+    @media(max-width: 460px) {
+      .wrap { width: min(100% - 24px,930px); }
+      .topbar-inner { min-height: 74px; }
+      .brand small { display: none; }
+      .brand strong { font-size: 18px; }
+      .brand-icon { width: 40px; height: 40px; }
+      .panel { border-radius: 18px; }
+      .answers { grid-template-columns: 1fr; }
+      .answer { min-height: 70px; }
+      .button-row .primary, .button-row .secondary { flex: 1 1 100%; }
+    }
+    @media(prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media print {
+      body { background: white; }
+      .topbar, .footer, .button-row, .read-tools, .text-toggle, .note, .quiz-progress, .answers { display:none !important; }
+      .wrap { width: 100%; } .panel { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="wrap topbar-inner">
+    <div class="brand"><span class="brand-icon" aria-hidden="true">Aa</span><div><strong>Hora de Ler</strong><small>Leitura com calma, um dia de cada vez</small></div></div>
+    <button id="homeButton" type="button" class="mini-btn" hidden>Início</button>
+  </div></header>
+  <main class="wrap" id="app" aria-live="polite"></main>
+  <footer class="footer">Feito para ler no tablet, sem anúncios e sem internet.</footer>
+<script>
+(() => {
+  'use strict';
+  const lessons = [
+    {
+      id: 'gato', title: 'O gato de Bia', icon: '🐈',
+      lines: ['A Bia ama o gato.', 'O gato mia na sala.', 'A Bia dá a bola ao gato.', 'O gato rola a bola.'],
+      questions: [
+        { text: 'A Bia ama o gato ou o sapo?', options: ['O gato', 'O sapo'], correct: 0, evidence: 0 },
+        { text: 'O gato mia na sala ou na rua?', options: ['Na sala', 'Na rua'], correct: 0, evidence: 1 },
+        { text: 'A Bia dá a bola ou a mala?', options: ['A mala', 'A bola'], correct: 1, evidence: 2 },
+        { text: 'O gato rola a bola ou pula?', options: ['Pula', 'Rola a bola'], correct: 1, evidence: 3 }
+      ]
+    },
+    {
+      id: 'pato', title: 'O pato no lago', icon: '🦆',
+      lines: ['O pato nada no lago.', 'A Lili vê o pato.', 'A Lili joga a bola.', 'O pato nada até a bola.'],
+      questions: [
+        { text: 'O pato nada no lago ou na sala?', options: ['Na sala', 'No lago'], correct: 1, evidence: 0 },
+        { text: 'A Lili vê o pato ou o gato?', options: ['O pato', 'O gato'], correct: 0, evidence: 1 },
+        { text: 'A Lili joga a bola ou a mala?', options: ['A bola', 'A mala'], correct: 0, evidence: 2 },
+        { text: 'O pato nada ou pula?', options: ['Pula', 'Nada'], correct: 1, evidence: 3 }
+      ]
+    },
+    {
+      id: 'pipa', title: 'A pipa de Lila', icon: '🪁',
+      lines: ['A Lila pega a pipa.', 'A pipa é da Lila.', 'A pipa voa na rua.', 'A Lila vê a pipa.'],
+      questions: [
+        { text: 'A Lila pega a pipa ou a bola?', options: ['A bola', 'A pipa'], correct: 1, evidence: 0 },
+        { text: 'A pipa é da Lila ou da Bia?', options: ['Da Lila', 'Da Bia'], correct: 0, evidence: 1 },
+        { text: 'A pipa voa na rua ou na sala?', options: ['Na rua', 'Na sala'], correct: 0, evidence: 2 },
+        { text: 'A Lila vê a pipa ou o pato?', options: ['O pato', 'A pipa'], correct: 1, evidence: 3 }
+      ]
+    }
+  ];
+
+  const app = document.getElementById('app');
+  const homeButton = document.getElementById('homeButton');
+  const storageKey = 'hora_de_ler_progresso_v1';
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch (_) {}
+  let current = null, stage = 'home', questionIndex = 0, answers = [], viewStory = false, fontSize = 32;
+
+  const escapeText = (str) => String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const save = () => { try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (_) {} };
+  const moveTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
+  function render() {
+    homeButton.hidden = stage === 'home';
+    if (stage === 'home') renderHome();
+    if (stage === 'read') renderRead();
+    if (stage === 'quiz') renderQuiz();
+    if (stage === 'result') renderResult();
+  }
+  function renderHome() {
+    app.innerHTML = `
+      <div class="eyebrow">Vamos ler!</div>
+      <h1>Uma boa história começa aqui.</h1>
+      <p class="intro">Leia uma história de quatro linhas. Depois, toque nas respostas de quatro perguntas bem fáceis.</p>
+      <section class="cards" aria-label="Escolha uma história">
+        ${lessons.map((lesson, i) => {
+          const stats = progress[lesson.id];
+          const scoreText = stats ? `Melhor nota: ${stats.best}/4 · ${stats.attempts} ${stats.attempts === 1 ? 'vez' : 'vezes'}` : 'Ainda não lida';
+          return `<button type="button" class="lesson" data-lesson="${lesson.id}">
+            <span class="lesson-art" aria-hidden="true">${lesson.icon}</span>
+            <span class="lesson-name">${escapeText(lesson.title)}</span>
+            <span class="lesson-meta">História ${i + 1} · 4 linhas · 4 perguntas</span>
+            <span class="lesson-score">${scoreText}</span>
+          </button>`;
+        }).join('')}
+      </section>
+      <p class="note"><strong>Dica para quem acompanha:</strong> deixe a criança ler em voz alta, sem pressa. Ajude só quando ela pedir. As notas ficam guardadas neste navegador.</p>`;
+    app.querySelectorAll('[data-lesson]').forEach(button => button.addEventListener('click', () => {
+      current = lessons.find(l => l.id === button.dataset.lesson);
+      answers = Array(current.questions.length).fill(null);
+      questionIndex = 0; viewStory = false; stage = 'read'; render(); moveTop();
+    }));
+  }
+  function storyMarkup() {
+    return `<div class="story-lines" style="--reading-size:${fontSize}px">${current.lines.map((line, i) => `<div class="story-line"><span class="line-num" aria-hidden="true">${i + 1}</span><span class="line-text">${escapeText(line)}</span></div>`).join('')}</div>`;
+  }
+  function renderRead() {
+    app.innerHTML = `<div class="panel">
+      <div class="eyebrow">Hora da leitura</div>
+      <h1 class="stage-title">${escapeText(current.title)}</h1>
+      <p class="helper">Leia uma linha de cada vez.</p>
+      ${storyMarkup()}
+      <div class="read-tools">
+        <span class="helper">Aponte para cada palavra ao ler.</span>
+        <div class="sizes">Letra <button type="button" class="size-btn" id="smaller" aria-label="Diminuir letra">A−</button><button type="button" class="size-btn" id="larger" aria-label="Aumentar letra">A+</button></div>
+      </div>
+      <div class="button-row"><button type="button" class="primary" id="startQuiz">Responder às perguntas →</button><button type="button" class="secondary" id="otherLesson">Outra história</button></div>
+    </div>`;
+    app.querySelector('#smaller').addEventListener('click', () => { fontSize = Math.max(24, fontSize - 4); renderRead(); });
+    app.querySelector('#larger').addEventListener('click', () => { fontSize = Math.min(48, fontSize + 4); renderRead(); });
+    app.querySelector('#startQuiz').addEventListener('click', () => { stage = 'quiz'; questionIndex = 0; render(); moveTop(); });
+    app.querySelector('#otherLesson').addEventListener('click', goHome);
+  }
+  function renderQuiz() {
+    const q = current.questions[questionIndex];
+    app.innerHTML = `<div class="panel">
+      <div class="stage-head"><span class="eyebrow">Vamos responder!</span><button type="button" class="text-toggle" id="toggleStory" aria-expanded="${viewStory}">${viewStory ? 'Fechar o texto' : 'Ver o texto'}</button></div>
+      <div class="quiz-progress"><div class="progress-track" role="progressbar" aria-label="Perguntas" aria-valuenow="${questionIndex+1}" aria-valuemin="1" aria-valuemax="4"><span style="width:${(questionIndex+1)/current.questions.length*100}%"></span></div><span class="progress-label">${questionIndex + 1} de ${current.questions.length}</span></div>
+      ${viewStory ? `<div class="reference"><strong>Leia de novo:</strong>${current.lines.map(line => `<p>${escapeText(line)}</p>`).join('')}</div><div class="divider"></div>` : ''}
+      <h1 class="question">${escapeText(q.text)}</h1>
+      <div class="answers" role="group" aria-label="Toque na resposta">
+        ${q.options.map((option, index) => `<button type="button" class="answer ${answers[questionIndex] === index ? 'selected' : ''}" data-choice="${index}" aria-pressed="${answers[questionIndex] === index}">${escapeText(option)}</button>`).join('')}
+      </div>
+      <div class="button-row">
+        ${questionIndex > 0 ? '<button type="button" class="secondary" id="prevQuestion">← Voltar</button>' : ''}
+        <button type="button" class="primary" id="nextQuestion" ${answers[questionIndex] === null ? 'disabled' : ''}>${questionIndex === current.questions.length - 1 ? 'Ver meu resultado ✓' : 'Próxima pergunta →'}</button>
+      </div>
+      <p class="helper">Toque em uma resposta e siga para a próxima pergunta.</p>
+    </div>`;
+    app.querySelector('#toggleStory').addEventListener('click', () => { viewStory = !viewStory; renderQuiz(); });
+    app.querySelectorAll('[data-choice]').forEach(button => button.addEventListener('click', () => {
+      answers[questionIndex] = Number(button.dataset.choice); renderQuiz();
+    }));
+    const prev = app.querySelector('#prevQuestion');
+    if (prev) prev.addEventListener('click', () => { questionIndex--; renderQuiz(); moveTop(); });
+    app.querySelector('#nextQuestion').addEventListener('click', () => {
+      if (answers[questionIndex] === null) return;
+      if (questionIndex < current.questions.length - 1) { questionIndex++; renderQuiz(); moveTop(); }
+      else { finish(); }
+    });
+  }
+  function finish() {
+    if (answers.some(a => a === null)) return;
+    const score = current.questions.reduce((total, q, i) => total + (answers[i] === q.correct ? 1 : 0), 0);
+    const prev = progress[current.id] || { attempts: 0, best: 0 };
+    progress[current.id] = { attempts: prev.attempts + 1, best: Math.max(prev.best, score), last: score };
+    save(); stage = 'result'; render(); moveTop();
+  }
+  function renderResult() {
+    const score = current.questions.reduce((total, q, i) => total + (answers[i] === q.correct ? 1 : 0), 0);
+    const cheer = score === 4 ? 'Você leu com muita atenção!' : score >= 2 ? 'Muito bem! Vamos ver as respostas.' : 'Boa tentativa! Leia de novo com calma.';
+    app.innerHTML = `<div class="panel">
+      <div class="results-head"><div class="result-icon" aria-hidden="true">${score === 4 ? '★' : '✓'}</div>
+      <div class="eyebrow">Fim da atividade</div>
+      <h1 class="result-number">${score} de 4 acertos</h1>
+      <p class="result-comment">${cheer}</p></div>
+      <div class="result-list">${current.questions.map((q, i) => {
+        const correct = answers[i] === q.correct;
+        return `<div class="result-item ${correct ? 'good' : 'bad'}"><span class="status-dot" aria-hidden="true">${correct ? '✓' : '×'}</span><div><strong>${i+1}. ${escapeText(q.text)}</strong><small>${correct ? 'Muito bem!' : `Resposta: ${escapeText(q.options[q.correct])}.`}<br>Leia no texto: “${escapeText(current.lines[q.evidence])}”</small></div></div>`;
+      }).join('')}</div>
+      <div class="button-row"><button type="button" class="primary" id="tryAgain">Ler e jogar de novo</button><button type="button" class="secondary" id="nextStory">Outra história</button></div>
+    </div>`;
+    app.querySelector('#tryAgain').addEventListener('click', () => { answers = Array(current.questions.length).fill(null); questionIndex = 0; viewStory = false; stage = 'read'; render(); moveTop(); });
+    app.querySelector('#nextStory').addEventListener('click', goHome);
+  }
+  function goHome() { stage = 'home'; current = null; render(); moveTop(); }
+  homeButton.addEventListener('click', goHome);
+  render();
+})();
+</script>
+</body>
+</html>

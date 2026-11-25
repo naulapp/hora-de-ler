@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f8f2">
+  <meta name="description" content="Atividades de leitura para crianças. Funciona sem internet depois de salvar o arquivo.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Hora de Ler</title>
+  <style>
+    :root {
+      --bg: #f8f8f2; --surface: #ffffff; --ink: #22313a; --muted: #61717c;
+      --blue: #285f82; --blue-dark: #194662; --pale: #eaf3f8;
+      --line: #dee6e9; --green: #237a53; --green-pale: #e8f6ee;
+      --red: #ac4947; --red-pale: #fff0ee;
+      --shadow: 0 16px 38px rgba(33, 55, 64, .075);
+      --reading-size: 32px;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; min-height: 100vh; font-family: Verdana, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, textarea:focus-visible { outline: 3px solid #db9747; outline-offset: 3px; }
+    .wrap { width: min(930px, calc(100% - 38px)); margin: auto; }
+    .topbar { background: rgba(255,255,255,.92); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+    .topbar-inner { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 13px; text-align: left; border: 0; background: transparent; padding: 0; color: inherit; }
+    .brand-icon { display: grid; place-items: center; background: #e6f1eb; color: #276647; border-radius: 16px; width: 47px; height: 47px; font-weight: 900; font-size: 22px; }
+    .brand strong { display: block; font-size: 20px; letter-spacing: -.7px; }
+    .brand small { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .mini-btn { background: transparent; color: var(--blue); border: 1px solid var(--line); padding: 11px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; }
+    main { padding: 29px 0 70px; }
+    .eyebrow { color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    h1 { font-size: clamp(26px, 4.3vw, 39px); line-height: 1.15; letter-spacing: -1.3px; margin: 9px 0 12px; }
+    .intro { font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 680px; margin: 0 0 8px; }
+    .group-title { font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin: 26px 0 12px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+    .lesson { text-align: left; background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 20px; min-height: 168px; transition: border-color .15s, transform .15s; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+    .lesson:hover { border-color: #8bb3c6; transform: translateY(-2px); }
+    .lesson-art { width: 58px; height: 58px; border-radius: 15px; display: grid; place-items: center; font-size: 28px; background: #ecf5f1; margin-bottom: 16px; font-weight: 900; color: #276647; }
+    .lesson-art.letters { font-size: 20px; letter-spacing: -.4px; }
+    .lesson-name { font-size: 19px; font-weight: 800; line-height: 1.35; }
+    .lesson-meta { color: var(--muted); font-size: 13px; margin-top: 7px; line-height: 1.45; }
+    .lesson-score { color: var(--green); font-weight: 700; font-size: 13px; margin-top: auto; padding-top: 13px; }
+    .lesson-score.waiting { color: var(--muted); font-weight: 650; }
+    .note { margin-top: 22px; padding: 16px 18px; background: #f1f2ea; border-radius: 14px; font-size: 14px; color: #55636b; line-height: 1.6; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: clamp(20px, 4.5vw, 42px); }
+    .stage-head { display: flex; gap: 14px; justify-content: space-between; align-items: center; margin-bottom: 19px; }
+    .stage-title { font-size: clamp(25px, 4.4vw, 34px); letter-spacing: -.8px; margin: 8px 0 12px; }
+    .story-lines { display: flex; flex-direction: column; gap: 14px; margin: 24px 0 31px; }
+    .story-line { display: flex; align-items: baseline; gap: 15px; border: 1px solid #e7ecec; border-radius: 15px; padding: 15px 18px; background: #fcfdfa; line-height: 1.45; }
+    .story-line .line-num { flex: 0 0 26px; color: #9aa9ac; font-size: 14px; font-weight: 700; text-align: center; }
+    .story-line .line-text { font-size: var(--reading-size); font-weight: 650; letter-spacing: .2px; overflow-wrap: anywhere; }
+    .read-tools, .sizes { display: flex; align-items: center; gap: 8px; }
+    .read-tools { justify-content: space-between; flex-wrap: wrap; }
+    .sizes { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .size-btn, .tool { display: grid; place-items: center; min-width: 45px; height: 45px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 800; color: var(--blue); padding: 0 12px; }
+    .size-btn:disabled, .tool:disabled { opacity: .4; cursor: default; }
+    .tool.on { background: var(--pale); border-color: #2779a5; }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin-top: 25px; }
+    .primary { border: 0; background: var(--blue); color: white; padding: 17px 23px; border-radius: 15px; font-size: 17px; font-weight: 800; min-height: 56px; }
+    .primary:hover { background: var(--blue-dark); }
+    .primary:disabled { background: #9cb2bf; cursor: not-allowed; }
+    .secondary { border: 1px solid #cddbe1; color: var(--blue-dark); background: #fff; padding: 16px 21px; border-radius: 15px; min-height: 56px; font-weight: 800; font-size: 15px; }
+    .helper { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .quiz-progress { display: flex; align-items: center; gap: 14px; margin: 0 0 23px; }
+    .progress-track { background: #e5edef; border-radius: 999px; overflow: hidden; height: 9px; flex: 1; }
+    .progress-track span { background: #64a4b4; height: 100%; display: block; }
+    .progress-label { color: var(--muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .question { font-weight: 800; font-size: var(--reading-size); line-height: 1.45; letter-spacing: -.3px; margin: 10px 0 22px; overflow-wrap: anywhere; }
+    .answers { display: grid; gap: 12px; }
+    .answer { text-align: left; display: flex; align-items: center; gap: 14px; min-height: 74px; border-radius: 18px; border: 2px solid #cfdbdf; background: #fff; color: var(--ink); font-size: clamp(18px, 2.6vw, 24px); font-weight: 800; padding: 14px 16px; line-height: 1.3; }
+    .answer:hover { border-color: #70a2bd; }
+    .mark { width: 36px; height: 36px; flex: 0 0 36px; border: 2px solid #9aafb8; border-radius: 8px; display: grid; place-items: center; font-size: 20px; }
+    .answer.selected { border-color: #2779a5; background: var(--pale); }
+    .answer.selected .mark { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .answer.right { border-color: var(--green); background: var(--green-pale); }
+    .answer.wrong { border-color: var(--red); background: var(--red-pale); }
+    .answer.locked { cursor: default; }
+    .answer.locked:hover { border-color: #cfdbdf; }
+    .answer.locked.selected:hover { border-color: #2779a5; }
+    .answer.locked.right:hover { border-color: var(--green); }
+    .answer.locked.wrong:hover { border-color: var(--red); }
+    .text-toggle { border: 0; background: #edf4f6; border-radius: 12px; padding: 12px 16px; color: var(--blue); font-weight: 800; font-size: 14px; }
+    .reference { margin: 0 0 18px; padding: 17px 20px; background: #f7f9f6; border: 1px solid var(--line); border-radius: 14px; }
+    .reference p { font-size: calc(var(--reading-size) * .72); line-height: 1.45; font-weight: 700; margin: 10px 0; }
+    .written { width: 100%; min-height: 150px; border: 2px solid #cfdbdf; border-radius: 16px; padding: 14px 16px; font-weight: 700; font-size: var(--reading-size); line-height: 1.35; color: var(--ink); background: #fff; resize: vertical; }
+    .pad { background: #fff; border: 2px solid #cfdbdf; border-radius: 16px; overflow: hidden; touch-action: none; }
+    .pad canvas { display: block; width: 100%; height: 240px; touch-action: none; cursor: crosshair; }
+    .banner { margin-top: 16px; border-radius: 14px; padding: 14px 16px; font-weight: 800; line-height: 1.45; }
+    .banner small { display: block; font-weight: 650; color: var(--ink); margin-top: 6px; }
+    .banner.good { background: var(--green-pale); color: var(--green); }
+    .banner.bad { background: var(--red-pale); color: #8d3b38; }
+    .adult-flag { display: inline-block; background: #f3eee4; color: #6d5b3b; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border-radius: 999px; }
+    .adult-card { border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-top: 14px; }
+    .adult-card strong { display: block; font-size: 18px; line-height: 1.4; margin-bottom: 10px; }
+    .child-text { font-size: 22px; font-weight: 700; white-space: pre-wrap; background: #f7f9f6; border-radius: 12px; padding: 12px 14px; margin: 0; }
+    .child-draw { width: 100%; max-width: 520px; background: #fff; border: 1px solid var(--line); border-radius: 12px; display: block; margin-top: 8px; }
+    .expect { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+    .judge { display: flex; gap: 10px; margin-top: 12px; }
+    .judge-btn { flex: 1; min-height: 52px; border-radius: 14px; font-weight: 800; background: #fff; }
+    .judge-btn.good { border: 2px solid #b7d7c4; color: var(--green); }
+    .judge-btn.bad { border: 2px solid #e4c4c0; color: var(--red); }
+    .judge-btn.good.on { background: var(--green); color: #fff; }
+    .judge-btn.bad.on { background: var(--red); color: #fff; }
+    .empty { padding: 22px; border: 1px dashed #c9d5da; border-radius: 16px; color: var(--muted); background: #fff; line-height: 1.55; }
+    .results-head { text-align: center; }
+    .result-icon { width: 82px; height: 82px; margin: 0 auto 15px; background: #ecf6ec; color: #2b764e; border-radius: 50%; display: grid; place-items: center; font-size: 42px; }
+    .result-number { font-size: clamp(30px, 5.3vw, 43px); font-weight: 900; margin: 10px 0 5px; }
+    .result-comment { color: var(--muted); font-size: 16px; line-height: 1.5; margin-bottom: 8px; }
+    .result-list { display: grid; gap: 10px; margin-top: 24px; }
+    .result-item { display: flex; gap: 13px; align-items: flex-start; border-radius: 13px; border: 1px solid var(--line); padding: 14px 16px; }
+    .result-item.good { background: var(--green-pale); border-color: #d0e7d8; }
+    .result-item.bad { background: var(--red-pale); border-color: #f3d8d3; }
+    .status-dot { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #fff; flex: 0 0 28px; font-weight: 900; }
+    .good .status-dot { color: var(--green); }
+    .bad .status-dot { color: var(--red); }
+    .result-item strong { display: block; margin-bottom: 6px; font-size: 15px; line-height: 1.5; }
+    .result-item small { font-size: 14px; line-height: 1.55; color: #42505a; }
+    .footer { color: #7e8c90; text-align: center; font-size: 12px; padding: 15px 20px 28px; line-height: 1.5; }
+    @media (max-width: 720px) {
+      .lesson { min-height: 0; display: grid; grid-template-columns: 66px 1fr; column-gap: 14px; align-items: center; padding: 15px; }
+      .lesson-art { grid-row: span 3; margin-bottom: 0; }
+      .lesson-score { padding-top: 5px; }
+      .story-line { padding: 13px 11px; gap: 8px; }
+    }
+    @media (max-width: 460px) {
+      .wrap { width: min(100% - 24px, 930px); }
+      .topbar-inner { min-height: 74px; }
+      .brand small { display: none; }
+      .brand strong { font-size: 18px; }
+      .brand-icon { width: 40px; height: 40px; }
+      .panel { border-radius: 18px; }
+      .button-row .primary, .button-row .secondary { flex: 1 1 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media print {
+      body { background: white; }
+      .topbar, .footer, .button-row, .read-tools, .sizes, .text-toggle, .note, .quiz-progress, .answers, .tools, .pad, .judge { display: none !important; }
+      .wrap { width: 100%; }
+      .panel { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="wrap topbar-inner">
+    <button type="button" class="brand" id="brandHome">
+      <span class="brand-icon" aria-hidden="true">Aa</span>
+      <span><strong>Hora de Ler</strong><small>Leitura com calma, um dia de cada vez</small></span>
+    </button>
+    <button id="homeButton" type="button" class="mini-btn" hidden>Início</button>
+  </div></header>
+  <main class="wrap" id="app" aria-live="polite"></main>
+  <footer class="footer">Feito para ler no tablet. Abra este arquivo mesmo sem internet. A melhor nota fica neste navegador.</footer>
+  <noscript><p class="note wrap">Para usar, abra este arquivo no Chrome ou no Edge, com o JavaScript ligado.</p></noscript>
+<script>
+(() => {
+  'use strict';
+
+  /* ============================================================
+     NÍVEIS E ATIVIDADES
+     Para colocar uma história nova, copie um bloco dentro de
+     activities e cole em seguida. Não precisa mexer no resto.
+
+     level:
+       s2   sílabas de no máximo 2 letras
+       s3   sílabas de até 3 letras
+       sall sílabas de qualquer tamanho
+       lh   tarefas com LH
+       nh   tarefas com NH
+       ch   tarefas com CH
+       Para outro som, copie um nível na lista levels (group: 'Sons').
+
+     Perguntas — mode:
+       "x"      a criança marca X e o sistema corrige
+       "texto"  a criança escreve e um adulto marca certo ou errado
+       "caneta" a criança escreve na tela e um adulto corrige
+
+     id tem de ser único.
+     line é a linha que prova a resposta. 0 é a primeira linha.
+     expect é só para o adulto ver. A criança não vê isso na pergunta.
+     ============================================================ */
+  const levels = [
+    { id: 's2', group: 'Leitura', badge: '2', title: 'Sílabas de até 2 letras', detail: 'Cada sílaba tem no máximo 2 letras. Por exemplo: ba, le, a.' },
+    { id: 's3', group: 'Leitura', badge: '3', title: 'Sílabas de até 3 letras', detail: 'Cada sílaba tem até 3 letras. Por exemplo: pra, mar, bo.' },
+    { id: 'sall', group: 'Leitura', badge: 'Aa', title: 'Sílabas de todos os tamanhos', detail: 'A sílaba pode ter qualquer tamanho.' },
+    { id: 'lh', group: 'Sons', badge: 'LH', title: 'Palavras com LH', detail: 'Textos para treinar o LH, como em palha e folha.' },
+    { id: 'nh', group: 'Sons', badge: 'NH', title: 'Palavras com NH', detail: 'Textos para treinar o NH, como em ninho e banho.' },
+    { id: 'ch', group: 'Sons', badge: 'CH', title: 'Palavras com CH', detail: 'Textos para treinar o CH, como em chuva e chave.' },
+    { id: 'teste', group: 'Adulto', badge: 'Ok', title: 'Testar os três jeitos', detail: 'Serve para ver a correção automática, o texto e a caneta.' }
+  ];
+
+  const groupLabels = {
+    Leitura: 'Níveis de leitura',
+    Sons: 'Sons especiais',
+    Adulto: 'Teste do aplicativo'
+  };
+
+  const activities = [
+    {
+      id: 'gato', level: 's2', title: 'O gato de Bia', icon: '🐈',
+      lines: ['A Bia ama o gato.', 'O gato mia na sala.', 'A Bia dá a bola ao gato.', 'O gato rola a bola.'],
+      questions: [
+        { mode: 'x', text: 'A Bia ama o gato ou o sapo?', options: ['O gato', 'O sapo'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O gato mia na sala ou na rua?', options: ['Na sala', 'Na rua'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Bia dá a bola ou a mala?', options: ['A mala', 'A bola'], correct: 1, line: 2 },
+        { mode: 'x', text: 'O gato rola a bola ou pula?', options: ['Pula', 'Rola a bola'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'pato', level: 's2', title: 'O pato no lago', icon: '🦆',
+      lines: ['O pato nada no lago.', 'A Lili vê o pato.', 'A Lili joga a bola.', 'O pato nada até a bola.'],
+      questions: [
+        { mode: 'x', text: 'O pato nada no lago ou na sala?', options: ['Na sala', 'No lago'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A Lili vê o pato ou o gato?', options: ['O pato', 'O gato'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Lili joga a bola ou a mala?', options: ['A bola', 'A mala'], correct: 0, line: 2 },
+        { mode: 'x', text: 'O pato nada ou pula?', options: ['Pula', 'Nada'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'pipa', level: 's2', title: 'A pipa de Lila', icon: '🪁',
+      lines: ['A Lila pega a pipa.', 'A pipa é da Lila.', 'A pipa voa na rua.', 'A Lila vê a pipa.'],
+      questions: [
+        { mode: 'x', text: 'A Lila pega a pipa ou a bola?', options: ['A bola', 'A pipa'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A pipa é da Lila ou da Bia?', options: ['Da Lila', 'Da Bia'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A pipa voa na rua ou na sala?', options: ['Na rua', 'Na sala'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Lila vê a pipa ou o pato?', options: ['O pato', 'A pipa'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'uva', level: 's2', title: 'A uva da Lili', icon: '🍇',
+      lines: ['A Lili pega a uva.', 'A uva é da Lili.', 'A Lili come a uva.', 'A Lili ama a uva.'],
+      questions: [
+        { mode: 'x', text: 'A Lili pega a uva ou a bola?', options: ['A bola', 'A uva'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A uva é da Lili ou da Bia?', options: ['Da Lili', 'Da Bia'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Lili come a uva ou a bola?', options: ['A uva', 'A bola'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Lili ama a uva ou o gato?', options: ['O gato', 'A uva'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'macaco', level: 's2', title: 'O macaco', icon: '🐵',
+      lines: ['O macaco pega a banana.', 'A banana é do macaco.', 'O macaco come a banana.', 'O macaco pula na sala.'],
+      questions: [
+        { mode: 'x', text: 'O macaco pega a banana ou a bola?', options: ['A bola', 'A banana'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A banana é do macaco ou da Lili?', options: ['Do macaco', 'Da Lili'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O macaco come a banana ou a uva?', options: ['A banana', 'A uva'], correct: 0, line: 2 },
+        { mode: 'x', text: 'O macaco pula na sala ou na rua?', options: ['Na rua', 'Na sala'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'menina', level: 's2', title: 'A menina e a boneca', icon: '👧',
+      lines: ['A menina pega a boneca.', 'A boneca é da menina.', 'A menina ama a boneca.', 'A menina leva a boneca na mala.'],
+      questions: [
+        { mode: 'x', text: 'A menina pega a boneca ou a pipa?', options: ['A boneca', 'A pipa'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A boneca é da menina ou do Duda?', options: ['Do Duda', 'Da menina'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A menina ama a boneca ou o pato?', options: ['A boneca', 'O pato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A menina leva a boneca na mala ou na sala?', options: ['Na sala', 'Na mala'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'pao', level: 's3', title: 'O pão no prato', icon: '🍞',
+      lines: ['A Bia põe o pão no prato.', 'O pão é da Bia.', 'A Bia come o pão.', 'A Bia lava o prato.'],
+      questions: [
+        { mode: 'x', text: 'A Bia põe o pão ou a uva no prato?', options: ['O pão', 'A uva'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O pão é da Bia ou da Lili?', options: ['Da Lili', 'Da Bia'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A Bia come o pão ou a banana?', options: ['O pão', 'A banana'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Bia lava o prato ou a mala?', options: ['A mala', 'O prato'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'mar', level: 's3', title: 'O pato no mar', icon: '🌊',
+      lines: ['O pato nada no mar.', 'O sol cai no mar.', 'A Lili vê o pato.', 'A Lili ama o pato.'],
+      questions: [
+        { mode: 'x', text: 'O pato nada no mar ou no lago?', options: ['No lago', 'No mar'], correct: 1, line: 0 },
+        { mode: 'x', text: 'O sol cai no mar ou na sala?', options: ['No mar', 'Na sala'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Lili vê o pato ou o gato?', options: ['O gato', 'O pato'], correct: 1, line: 2 },
+        { mode: 'x', text: 'A Lili ama o pato ou a mala?', options: ['O pato', 'A mala'], correct: 0, line: 3 }
+      ]
+    },
+    {
+      id: 'porta', level: 's3', title: 'A porta da sala', icon: '🚪',
+      lines: ['O Duda abre a porta.', 'A bola está na sala.', 'O Duda pega a bola.', 'O Duda joga a bola.'],
+      questions: [
+        { mode: 'x', text: 'O Duda abre a porta ou a mala?', options: ['A mala', 'A porta'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A bola está na sala ou na rua?', options: ['Na sala', 'Na rua'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O Duda pega a bola ou o prato?', options: ['A bola', 'O prato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'O Duda joga a bola ou a carta?', options: ['A carta', 'A bola'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'carta', level: 's3', title: 'A carta da vovó', icon: '✉️',
+      lines: ['A vovó manda a carta.', 'A carta é da vovó.', 'A Lila lê a carta.', 'A Lila ama a vovó.'],
+      questions: [
+        { mode: 'x', text: 'A vovó manda a carta ou a bola?', options: ['A carta', 'A bola'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A carta é da vovó ou da Lila?', options: ['Da Lila', 'Da vovó'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A Lila lê a carta ou o prato?', options: ['A carta', 'O prato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Lila ama a vovó ou o pato?', options: ['O pato', 'A vovó'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'flores', level: 'sall', title: 'Três flores', icon: '🌸',
+      lines: ['A Lila tem três flores.', 'A flor branca é grande.', 'A Lila brinca com a flor.', 'A Lila ama as flores.'],
+      questions: [
+        { mode: 'x', text: 'A Lila tem três flores ou três bolas?', options: ['Três flores', 'Três bolas'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A flor branca é grande ou pequena?', options: ['É pequena', 'É grande'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A Lila brinca com a flor ou com o pato?', options: ['Com a flor', 'Com o pato'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra flor.', expect: 'flor' }
+      ]
+    },
+    {
+      id: 'brinquedo', level: 'sall', title: 'O brinquedo', icon: '🧸',
+      lines: ['O menino pega o brinquedo.', 'O brinquedo é grande.', 'O menino brinca na sala.', 'O menino guarda o brinquedo.'],
+      questions: [
+        { mode: 'x', text: 'O menino pega o brinquedo ou a bola?', options: ['A bola', 'O brinquedo'], correct: 1, line: 0 },
+        { mode: 'x', text: 'O brinquedo é grande ou pequeno?', options: ['É grande', 'É pequeno'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O menino brinca na sala ou na rua?', options: ['Na rua', 'Na sala'], correct: 1, line: 2 },
+        { mode: 'texto', text: 'Quem guarda o brinquedo?', expect: 'O menino' }
+      ]
+    },
+    {
+      id: 'planta', level: 'sall', title: 'A planta grande', icon: '🌱',
+      lines: ['O gato sobe na planta.', 'A planta é grande.', 'A planta tem uma flor branca.', 'A Bia pega o gato.'],
+      questions: [
+        { mode: 'x', text: 'O gato sobe na planta ou na mesa?', options: ['Na planta', 'Na mesa'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A planta é grande ou pequena?', options: ['É pequena', 'É grande'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A planta tem uma flor branca ou uma bola?', options: ['Uma flor branca', 'Uma bola'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Bia pega o gato ou o pato?', options: ['O pato', 'O gato'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'coelho', level: 'lh', title: 'O coelho e a folha', icon: '🐰',
+      lines: ['O coelho pula na folha.', 'O coelho come a folha.', 'A Lila olha o coelho.', 'O olho do coelho é preto.'],
+      questions: [
+        { mode: 'x', text: 'O coelho pula na folha ou na bola?', options: ['Na bola', 'Na folha'], correct: 1, line: 0 },
+        { mode: 'x', text: 'O coelho come a folha ou a banana?', options: ['A folha', 'A banana'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Lila olha o coelho ou o pato?', options: ['O pato', 'O coelho'], correct: 1, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra folha.', expect: 'folha' }
+      ]
+    },
+    {
+      id: 'toalha', level: 'lh', title: 'A toalha da Lili', icon: '🧺',
+      lines: ['A toalha da Lili está molhada.', 'A toalha está na palha.', 'A Lili pega a toalha.', 'A Lili dobra a toalha.'],
+      questions: [
+        { mode: 'x', text: 'A toalha da Lili está molhada ou seca?', options: ['Molhada', 'Seca'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A toalha está na palha ou na mala?', options: ['Na mala', 'Na palha'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A Lili pega a toalha ou a bola?', options: ['A toalha', 'A bola'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Lili dobra a toalha ou a carta?', options: ['A carta', 'A toalha'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'milho', level: 'lh', title: 'O milho da Bia', icon: '🌽',
+      lines: ['A Bia colhe o milho.', 'A Bia tira a palha.', 'O milho é amarelo.', 'A Bia leva o milho para casa.'],
+      questions: [
+        { mode: 'x', text: 'A Bia colhe o milho ou a uva?', options: ['O milho', 'A uva'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A Bia tira a palha ou a bola?', options: ['A bola', 'A palha'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O milho é amarelo ou azul?', options: ['Amarelo', 'Azul'], correct: 0, line: 2 },
+        { mode: 'texto', text: 'Quem colhe o milho?', expect: 'A Bia' }
+      ]
+    },
+    {
+      id: 'ninho', level: 'nh', title: 'O ninho', icon: '🐦',
+      lines: ['O passarinho faz o ninho.', 'O ninho fica na árvore.', 'O passarinho volta ao ninho.', 'A Lila não pega o ninho.'],
+      questions: [
+        { mode: 'x', text: 'O passarinho faz o ninho ou a bola?', options: ['O ninho', 'A bola'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O ninho fica na árvore ou na sala?', options: ['Na sala', 'Na árvore'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O passarinho volta ao ninho ou ao mar?', options: ['Ao ninho', 'Ao mar'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Lila pega o ninho?', options: ['Não', 'Sim'], correct: 0, line: 3 }
+      ]
+    },
+    {
+      id: 'banho', level: 'nh', title: 'O banho', icon: '🛁',
+      lines: ['O menino toma banho de manhã.', 'O banho é quente.', 'O menino ganha um pato.', 'O menino brinca no banho.'],
+      questions: [
+        { mode: 'x', text: 'O menino toma banho de manhã ou de noite?', options: ['De manhã', 'De noite'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O banho é quente ou frio?', options: ['Frio', 'Quente'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O menino ganha um pato ou um gato?', options: ['Um pato', 'Um gato'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra banho.', expect: 'banho' }
+      ]
+    },
+    {
+      id: 'galinha', level: 'nh', title: 'A galinha', icon: '🐔',
+      lines: ['A galinha caminha no caminho.', 'A galinha tem um ninho.', 'A galinha põe o ovo.', 'A Bia cuida da galinha.'],
+      questions: [
+        { mode: 'x', text: 'A galinha caminha no caminho ou na sala?', options: ['No caminho', 'Na sala'], correct: 0, line: 0 },
+        { mode: 'x', text: 'A galinha tem um ninho ou uma mala?', options: ['Uma mala', 'Um ninho'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A galinha põe o ovo ou a bola?', options: ['O ovo', 'A bola'], correct: 0, line: 2 },
+        { mode: 'texto', text: 'Quem cuida da galinha?', expect: 'A Bia' }
+      ]
+    },
+    {
+      id: 'chuva', level: 'ch', title: 'A chuva', icon: '🌧️',
+      lines: ['A chuva cai no chão.', 'O cachorro corre da chuva.', 'A Lila chama o cachorro.', 'O cachorro entra na sala.'],
+      questions: [
+        { mode: 'x', text: 'A chuva cai no chão ou na mesa?', options: ['No chão', 'Na mesa'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O cachorro corre da chuva ou do sol?', options: ['Do sol', 'Da chuva'], correct: 1, line: 1 },
+        { mode: 'x', text: 'A Lila chama o cachorro ou o pato?', options: ['O cachorro', 'O pato'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra chuva.', expect: 'chuva' }
+      ]
+    },
+    {
+      id: 'chave', level: 'ch', title: 'A chave', icon: '🔑',
+      lines: ['A Bia perde a chave.', 'A chave está no chapéu.', 'A Bia acha a chave.', 'A Bia abre a porta com a chave.'],
+      questions: [
+        { mode: 'x', text: 'A Bia perde a chave ou a bola?', options: ['A bola', 'A chave'], correct: 1, line: 0 },
+        { mode: 'x', text: 'A chave está no chapéu ou na mala?', options: ['No chapéu', 'Na mala'], correct: 0, line: 1 },
+        { mode: 'x', text: 'A Bia acha a chave ou o pato?', options: ['A chave', 'O pato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'A Bia abre a porta com a chave ou com a bola?', options: ['Com a bola', 'Com a chave'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'chinelo', level: 'ch', title: 'O chinelo', icon: '👟',
+      lines: ['O Duda calça o chinelo.', 'O chinelo é do Duda.', 'O Duda pisa no chão.', 'O chinelo fica na chuva.'],
+      questions: [
+        { mode: 'x', text: 'O Duda calça o chinelo ou a bota?', options: ['O chinelo', 'A bota'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O chinelo é do Duda ou da Lila?', options: ['Da Lila', 'Do Duda'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O Duda pisa no chão ou na mesa?', options: ['No chão', 'Na mesa'], correct: 0, line: 2 },
+        { mode: 'texto', text: 'Onde o chinelo fica?', expect: 'Na chuva' }
+      ]
+    },
+    {
+      id: 'teste-jeitos', level: 'teste', title: 'Os três jeitos de responder', icon: '✏️',
+      lines: ['A Bia ama o gato.', 'O gato mia na sala.'],
+      questions: [
+        { mode: 'x', text: 'A Bia ama o gato ou o sapo?', options: ['O gato', 'O sapo'], correct: 0, line: 0 },
+        { mode: 'texto', text: 'Quem ama o gato?', expect: 'A Bia' },
+        { mode: 'caneta', text: 'Escreva a palavra gato.', expect: 'gato' }
+      ]
+    }
+  ];
+
+  const app = document.getElementById('app');
+  const homeButton = document.getElementById('homeButton');
+  const storageKey = 'hora_de_ler_progresso_v2';
+  const fontKey = 'hora_de_ler_fonte_v1';
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch (_) { progress = {}; }
+  let fontSize = 32;
+  try {
+    const savedFont = Number(localStorage.getItem(fontKey));
+    if (savedFont >= 24 && savedFont <= 60) fontSize = savedFont;
+  } catch (_) {}
+
+  let stage = 'home';
+  let levelId = null;
+  let current = null;
+  let questionIndex = 0;
+  let answers = [];
+  let adultMarks = [];
+  let viewStory = false;
+  let savedThisRound = false;
+
+  const escapeText = (str) => String(str ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+
+  function applyFont() {
+    document.documentElement.style.setProperty('--reading-size', fontSize + 'px');
+    try { localStorage.setItem(fontKey, String(fontSize)); } catch (_) {}
+  }
+  function saveProgressStore() {
+    try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch (_) {}
+  }
+  function moveTop() { window.scrollTo({ top: 0, behavior: 'auto' }); }
+  function levelById(id) { return levels.find((level) => level.id === id); }
+  function activitiesOf(id) { return activities.filter((item) => item.level === id); }
+  function blankAnswers(activity) {
+    return activity.questions.map(() => ({ choice: null, locked: false, text: '', image: '', ink: false }));
+  }
+  function bestText(id) {
+    const stats = progress[id];
+    if (!stats || typeof stats.best !== 'number') return 'Ainda não feita';
+    const vezes = stats.attempts === 1 ? 'vez' : 'vezes';
+    return `Melhor nota: ${stats.best}/${stats.total} · ${stats.attempts} ${vezes}`;
+  }
+  function modeSummary(activity) {
+    const modes = new Set(activity.questions.map((q) => q.mode));
+    const names = [];
+    if (modes.has('x')) names.push('marcar X');
+    if (modes.has('texto')) names.push('escrever');
+    if (modes.has('caneta')) names.push('caneta');
+    return names.join(' · ');
+  }
+  function needsAdult(activity) {
+    return activity.questions.some((q) => q.mode !== 'x');
+  }
+  function autoCount() {
+    let score = 0;
+    let total = 0;
+    current.questions.forEach((q, i) => {
+      if (q.mode !== 'x') return;
+      total += 1;
+      if (answers[i] && answers[i].choice === q.correct) score += 1;
+    });
+    return { score, total };
+  }
+  function scoreOf() {
+    return current.questions.reduce((total, q, i) => {
+      if (q.mode === 'x') return total + (answers[i].choice === q.correct ? 1 : 0);
+      return total + (adultMarks[i] === true ? 1 : 0);
+    }, 0);
+  }
+  function adultReady() {
+    return current.questions.every((q, i) => q.mode === 'x' || adultMarks[i] === true || adultMarks[i] === false);
+  }
+  function syncDom() {
+    if (!current || !answers[questionIndex]) return;
+    const written = document.getElementById('written');
+    if (written) answers[questionIndex].text = written.value;
+    const pad = document.getElementById('pad');
+    if (pad && answers[questionIndex].ink) answers[questionIndex].image = pad.toDataURL('image/png');
+  }
+  function changeFont(delta) {
+    syncDom();
+    fontSize = Math.min(60, Math.max(24, fontSize + delta));
+    applyFont();
+    render();
+  }
+  function bindSizes() {
+    const smaller = app.querySelector('#smaller');
+    const larger = app.querySelector('#larger');
+    if (!smaller || !larger) return;
+    smaller.disabled = fontSize <= 24;
+    larger.disabled = fontSize >= 60;
+    smaller.addEventListener('click', () => changeFont(-4));
+    larger.addEventListener('click', () => changeFont(4));
+  }
+  function sizeControls() {
+    return `<div class="sizes">Letra <button type="button" class="size-btn" id="smaller" aria-label="Diminuir a letra">A−</button><button type="button" class="size-btn" id="larger" aria-label="Aumentar a letra">A+</button></div>`;
+  }
+  function storyMarkup() {
+    if (!current.lines.length) return '<p class="empty">Esta atividade ainda não tem texto.</p>';
+    return `<div class="story-lines">${current.lines.map((line, i) => `<div class="story-line"><span class="line-num" aria-hidden="true">${i + 1}</span><span class="line-text">${escapeText(line)}</span></div>`).join('')}</div>`;
+  }
+  function lineQuote(q) {
+    if (typeof q.line !== 'number' || !current.lines[q.line]) return '';
+    return `<small>No texto: “${escapeText(current.lines[q.line])}”</small>`;
+  }
+
+  function render() {
+    homeButton.hidden = stage === 'home';
+    if (stage === 'home') renderHome();
+    else if (stage === 'level') renderLevel();
+    else if (stage === 'read') renderRead();
+    else if (stage === 'quiz') renderQuiz();
+    else if (stage === 'adult') renderAdult();
+    else if (stage === 'result') renderResult();
+  }
+
+  function renderHome() {
+    const groups = [];
+    levels.forEach((level) => {
+      let group = groups.find((item) => item.name === level.group);
+      if (!group) {
+        group = { name: level.group, levels: [] };
+        groups.push(group);
+      }
+      group.levels.push(level);
+    });
+    app.innerHTML = `
+      <div class="eyebrow">Vamos ler!</div>
+      <h1>Escolha um nível.</h1>
+      <p class="intro">A criança lê o texto e responde. Pode marcar X, escrever ou usar a caneta do tablet.</p>
+      ${groups.map((group) => `
+        <h2 class="group-title">${escapeText(groupLabels[group.name] || group.name)}</h2>
+        ${group.name === 'Adulto' ? '<p class="helper">Isto não é uma história da criança. Serve para experimentar os três jeitos de responder.</p>' : ''}
+        <section class="cards" aria-label="${escapeText(groupLabels[group.name] || group.name)}">
+          ${group.levels.map((level) => {
+            const count = activitiesOf(level.id).length;
+            const countText = count === 0 ? 'Nenhuma história ainda' : `${count} ${count === 1 ? 'história' : 'histórias'}`;
+            return `<button type="button" class="lesson" data-level="${escapeText(level.id)}">
+              <span class="lesson-art letters" aria-hidden="true">${escapeText(level.badge)}</span>
+              <span class="lesson-name">${escapeText(level.title)}</span>
+              <span class="lesson-meta">${escapeText(level.detail)}</span>
+              <span class="lesson-score waiting">${countText}</span>
+            </button>`;
+          }).join('')}
+        </section>
+      `).join('')}
+      <p class="note"><strong>Para quem acompanha:</strong> deixe a criança ler em voz alta, sem pressa. Comece pelas sílabas de até 2 letras. A melhor nota fica neste navegador. Para guardar a folha, exporte a tarefa em branco ou, no fim, a tarefa feita.</p>`;
+    app.querySelectorAll('[data-level]').forEach((button) => {
+      button.addEventListener('click', () => openLevel(button.dataset.level));
+    });
+  }
+
+  function renderLevel() {
+    const level = levelById(levelId);
+    if (!level) return goHome();
+    const list = activitiesOf(level.id);
+    app.innerHTML = `
+      <div class="eyebrow">${escapeText(groupLabels[level.group] || '')}</div>
+      <h1>${escapeText(level.title)}</h1>
+      <p class="intro">${escapeText(level.detail)}</p>
+      ${list.length ? `<section class="cards" aria-label="Histórias">${list.map((activity) => `<button type="button" class="lesson" data-activity="${escapeText(activity.id)}">
+          <span class="lesson-art" aria-hidden="true">${escapeText(activity.icon || 'Aa')}</span>
+          <span class="lesson-name">${escapeText(activity.title)}</span>
+          <span class="lesson-meta">${activity.lines.length} linhas · ${activity.questions.length} perguntas · ${escapeText(modeSummary(activity))}</span>
+          <span class="lesson-score ${progress[activity.id] ? '' : 'waiting'}">${escapeText(bestText(activity.id))}</span>
+        </button>`).join('')}</section>` : '<p class="empty">Nenhuma história ainda. Quando as atividades deste nível forem colocadas no arquivo, elas aparecem aqui.</p>'}
+      <div class="button-row"><button type="button" class="secondary" id="backHome">← Níveis</button></div>`;
+    app.querySelectorAll('[data-activity]').forEach((button) => {
+      button.addEventListener('click', () => openActivity(button.dataset.activity));
+    });
+    app.querySelector('#backHome').addEventListener('click', goHome);
+  }
+
+  function renderRead() {
+    const mixed = needsAdult(current);
+    app.innerHTML = `<div class="panel">
+      <div class="eyebrow">Hora da leitura</div>
+      <h1 class="stage-title">${escapeText(current.title)}</h1>
+      <p class="helper">Leia uma linha de cada vez. ${mixed ? 'Algumas respostas o sistema corrige. Outras ficam para um adulto.' : 'Depois, marque X nas respostas. O sistema diz se acertou.'}</p>
+      ${storyMarkup()}
+      <div class="read-tools">
+        <span class="helper">Aponte para cada palavra ao ler.</span>
+        ${sizeControls()}
+      </div>
+      <div class="button-row">
+        ${current.questions.length ? '<button type="button" class="primary" id="startQuiz">Responder às perguntas →</button>' : ''}
+        <button type="button" class="secondary" id="exportBlank">Exportar em branco</button>
+        <button type="button" class="secondary" id="backLevel">Voltar às histórias</button>
+      </div>
+    </div>`;
+    bindSizes();
+    const start = app.querySelector('#startQuiz');
+    if (start) start.addEventListener('click', () => { stage = 'quiz'; questionIndex = 0; render(); moveTop(); });
+    app.querySelector('#exportBlank').addEventListener('click', () => downloadSheet(false));
+    app.querySelector('#backLevel').addEventListener('click', goLevel);
+  }
+
+  function feedbackHtml(q, a) {
+    if (q.mode !== 'x' || !a.locked) return '';
+    const right = Array.isArray(q.options) ? q.options[q.correct] : '';
+    const ok = a.choice === q.correct;
+    if (ok) return `<div class="banner good" role="status">Acertou! ${lineQuote(q)}</div>`;
+    return `<div class="banner bad" role="status">Errou. A resposta é “${escapeText(right || '')}”. ${lineQuote(q)}</div>`;
+  }
+  function choiceHtml(q, a) {
+    const options = Array.isArray(q.options) ? q.options : [];
+    if (!options.length) return '<p class="empty">Esta pergunta ainda não tem alternativas.</p>';
+    return `<div class="answers" role="group" aria-label="Marque um X">${options.map((option, index) => {
+      const selected = a.choice === index;
+      const right = a.locked && index === q.correct;
+      const wrong = a.locked && selected && index !== q.correct;
+      const cls = ['answer', a.locked ? 'locked' : '', selected ? 'selected' : '', right ? 'right' : '', wrong ? 'wrong' : ''].filter(Boolean).join(' ');
+      return `<button type="button" class="${cls}" data-choice="${index}" aria-pressed="${selected}"><span class="mark" aria-hidden="true">${selected ? 'X' : ''}</span><span>${escapeText(option)}</span></button>`;
+    }).join('')}</div>${feedbackHtml(q, a)}`;
+  }
+
+  function renderQuiz() {
+    const q = current.questions[questionIndex];
+    const a = answers[questionIndex];
+    const total = current.questions.length;
+    const isLast = questionIndex === total - 1;
+    const nextLabel = isLast ? (needsAdult(current) ? 'Chamar o adulto' : 'Ver meu resultado') : 'Próxima pergunta →';
+    let body = '';
+    let helper = '';
+    let primary = '';
+    if (q.mode === 'x') {
+      body = choiceHtml(q, a);
+      helper = a.locked ? 'Pode seguir para a próxima.' : 'Marque um X e confirme.';
+      primary = a.locked
+        ? `<button type="button" class="primary" id="nextQuestion">${nextLabel}</button>`
+        : `<button type="button" class="primary" id="confirmChoice" ${a.choice === null ? 'disabled' : ''}>Confirmar</button>`;
+    } else if (q.mode === 'caneta') {
+      body = `<div class="pad"><canvas id="pad" aria-label="Espaço para escrever com a caneta"></canvas></div>
+        <div class="tools">
+          <button type="button" class="tool on" id="toolPen">Caneta</button>
+          <button type="button" class="tool" id="toolEraser">Borracha</button>
+          <button type="button" class="tool" id="toolUndo">Desfazer</button>
+          <button type="button" class="tool" id="toolClear">Apagar tudo</button>
+        </div>`;
+      helper = 'Escreva com o dedo ou a caneta. Um adulto vai corrigir.';
+      primary = `<button type="button" class="primary" id="nextQuestion" ${a.ink ? '' : 'disabled'}>${nextLabel}</button>`;
+    } else {
+      body = '<textarea id="written" class="written" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Escreva aqui"></textarea>';
+      helper = 'Escreva a resposta. Um adulto vai corrigir.';
+      primary = `<button type="button" class="primary" id="nextQuestion">${nextLabel}</button>`;
+    }
+    app.innerHTML = `<div class="panel">
+      <div class="stage-head">
+        <span class="eyebrow">${q.mode === 'x' ? 'Marque X' : q.mode === 'caneta' ? 'Caneta' : 'Escreva'}</span>
+        <button type="button" class="text-toggle" id="toggleStory" aria-expanded="${viewStory}">${viewStory ? 'Fechar o texto' : 'Ver o texto'}</button>
+      </div>
+      <div class="quiz-progress">
+        <div class="progress-track" role="progressbar" aria-label="Perguntas" aria-valuenow="${questionIndex + 1}" aria-valuemin="1" aria-valuemax="${total}"><span style="width:${((questionIndex + 1) / total) * 100}%"></span></div>
+        <span class="progress-label">${questionIndex + 1} de ${total}</span>
+      </div>
+      ${viewStory ? `<div class="reference"><strong>Leia de novo:</strong>${current.lines.map((line) => `<p>${escapeText(line)}</p>`).join('')}</div>` : ''}
+      <h1 class="question">${escapeText(q.text)}</h1>
+      ${body}
+      <div class="button-row">
+        ${questionIndex > 0 ? '<button type="button" class="secondary" id="prevQuestion">← Voltar</button>' : ''}
+        ${primary}
+        ${sizeControls()}
+      </div>
+      <p class="helper">${helper}</p>
+    </div>`;
+    bindSizes();
+    app.querySelector('#toggleStory').addEventListener('click', () => { syncDom(); viewStory = !viewStory; render(); });
+    const prev = app.querySelector('#prevQuestion');
+    if (prev) prev.addEventListener('click', () => { syncDom(); questionIndex -= 1; render(); moveTop(); });
+    if (q.mode === 'x') bindChoice();
+    else if (q.mode === 'caneta') bindPad();
+    else bindText();
+  }
+
+  function bindChoice() {
+    const a = answers[questionIndex];
+    app.querySelectorAll('[data-choice]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (a.locked) return;
+        a.choice = Number(button.dataset.choice);
+        render();
+      });
+    });
+    const confirm = app.querySelector('#confirmChoice');
+    if (confirm) confirm.addEventListener('click', () => {
+      if (a.choice === null) return;
+      a.locked = true;
+      render();
+    });
+    const next = app.querySelector('#nextQuestion');
+    if (next) next.addEventListener('click', advance);
+  }
+  function bindText() {
+    const written = app.querySelector('#written');
+    const next = app.querySelector('#nextQuestion');
+    written.value = answers[questionIndex].text;
+    const refresh = () => {
+      answers[questionIndex].text = written.value;
+      next.disabled = written.value.trim() === '';
+    };
+    written.addEventListener('input', refresh);
+    refresh();
+    next.addEventListener('click', () => {
+      if (written.value.trim() === '') return;
+      answers[questionIndex].text = written.value;
+      advance();
+    });
+  }
+  function bindPad() {
+    const canvas = app.querySelector('#pad');
+    const next = app.querySelector('#nextQuestion');
+    const state = answers[questionIndex];
+    mountPad(canvas, state, () => { next.disabled = !state.ink; });
+    next.addEventListener('click', () => {
+      if (!state.ink) return;
+      state.image = canvas.toDataURL('image/png');
+      advance();
+    });
+  }
+  function advance() {
+    syncDom();
+    if (questionIndex < current.questions.length - 1) {
+      questionIndex += 1;
+      render();
+      moveTop();
+      return;
+    }
+    if (needsAdult(current)) {
+      adultMarks = current.questions.map(() => null);
+      stage = 'adult';
+      render();
+      moveTop();
+      return;
+    }
+    grade();
+  }
+  function grade() {
+    const score = scoreOf();
+    const total = current.questions.length;
+    if (!savedThisRound) {
+      const prev = progress[current.id];
+      const attempts = (prev && prev.attempts ? prev.attempts : 0) + 1;
+      let best = score;
+      let bestTotal = total;
+      if (prev && typeof prev.best === 'number' && prev.total && (prev.best / prev.total) >= (score / total)) {
+        best = prev.best;
+        bestTotal = prev.total;
+      }
+      progress[current.id] = { attempts, best, total: bestTotal, last: score, lastTotal: total };
+      saveProgressStore();
+      savedThisRound = true;
+    }
+    stage = 'result';
+    render();
+    moveTop();
+  }
+
+  function mountPad(canvas, state, onChange) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.style.width = '100%';
+    canvas.style.height = '240px';
+    const w = Math.max(280, canvas.clientWidth || 280);
+    const h = 240;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d');
+    let erasing = false;
+    let drawing = false;
+    let last = null;
+    let open = false;
+    let undoStack = [];
+    let baselineInk = !!state.ink;
+    const undoButton = app.querySelector('#toolUndo');
+
+    function applyTool() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = erasing ? '#ffffff' : '#22313a';
+      ctx.lineWidth = erasing ? 22 : 5;
+    }
+    function paintWhite() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      applyTool();
+    }
+    function show(url, done) {
+      const img = new Image();
+      img.onload = () => { paintWhite(); ctx.drawImage(img, 0, 0, w, h); applyTool(); if (done) done(); };
+      img.onerror = () => { paintWhite(); if (done) done(); };
+      img.src = url;
+    }
+    function refreshUndo() { undoButton.disabled = undoStack.length === 0; }
+    if (state.image) show(state.image, () => { open = true; });
+    else { paintWhite(); open = true; }
+    refreshUndo();
+
+    function point(event) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    }
+    canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+    canvas.addEventListener('pointerdown', (event) => {
+      if (!open) return;
+      event.preventDefault();
+      try { canvas.setPointerCapture(event.pointerId); } catch (_) {}
+      undoStack.push(canvas.toDataURL('image/png'));
+      refreshUndo();
+      drawing = true;
+      last = point(event);
+      applyTool();
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(last.x + 0.01, last.y + 0.01);
+      ctx.stroke();
+      state.ink = true;
+      onChange();
+    }, { passive: false });
+    canvas.addEventListener('pointermove', (event) => {
+      if (!drawing) return;
+      event.preventDefault();
+      const next = point(event);
+      applyTool();
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(next.x, next.y);
+      ctx.stroke();
+      last = next;
+    }, { passive: false });
+    function endStroke() {
+      if (!drawing) return;
+      drawing = false;
+      state.image = canvas.toDataURL('image/png');
+      state.ink = true;
+      onChange();
+    }
+    canvas.addEventListener('pointerup', endStroke);
+    canvas.addEventListener('pointercancel', endStroke);
+
+    function setTool(erase) {
+      erasing = erase;
+      app.querySelector('#toolPen').classList.toggle('on', !erase);
+      app.querySelector('#toolEraser').classList.toggle('on', erase);
+    }
+    app.querySelector('#toolPen').addEventListener('click', () => setTool(false));
+    app.querySelector('#toolEraser').addEventListener('click', () => setTool(true));
+    undoButton.addEventListener('click', () => {
+      const prev = undoStack.pop();
+      refreshUndo();
+      if (!prev) return;
+      show(prev, () => {
+        if (undoStack.length === 0) {
+          state.ink = baselineInk;
+          state.image = baselineInk ? prev : '';
+        } else {
+          state.ink = true;
+          state.image = canvas.toDataURL('image/png');
+        }
+        onChange();
+      });
+    });
+    app.querySelector('#toolClear').addEventListener('click', () => {
+      undoStack = [];
+      baselineInk = false;
+      paintWhite();
+      state.ink = false;
+      state.image = '';
+      refreshUndo();
+      onChange();
+    });
+  }
+
+  function renderAdult() {
+    const auto = autoCount();
+    const cards = current.questions.map((q, i) => ({ q, i })).filter((item) => item.q.mode !== 'x');
+    app.innerHTML = `<div class="panel">
+      <span class="adult-flag">Adulto</span>
+      <h1 class="stage-title">Corrigir as respostas</h1>
+      <p class="helper">A criança já respondeu. Marque certo ou errado. ${auto.total ? `O sistema já corrigiu as de marcar X: ${auto.score} de ${auto.total}.` : ''}</p>
+      ${cards.map(({ q, i }) => {
+        const answer = answers[i];
+        const body = q.mode === 'caneta'
+          ? (answer.image ? `<img class="child-draw" alt="Resposta escrita à mão" src="${answer.image}">` : '<p class="child-text">Não escreveu.</p>')
+          : `<p class="child-text">${escapeText(answer.text || 'Não escreveu.')}</p>`;
+        return `<article class="adult-card">
+          <strong>${i + 1}. ${escapeText(q.text)}</strong>
+          ${body}
+          ${q.expect ? `<p class="expect">Resposta esperada: ${escapeText(q.expect)}</p>` : ''}
+          <div class="judge">
+            <button type="button" class="judge-btn good ${adultMarks[i] === true ? 'on' : ''}" data-q="${i}" data-judge="1">Certo</button>
+            <button type="button" class="judge-btn bad ${adultMarks[i] === false ? 'on' : ''}" data-q="${i}" data-judge="0">Errado</button>
+          </div>
+        </article>`;
+      }).join('')}
+      <div class="button-row">
+        <button type="button" class="secondary" id="backToChild">← Voltar à última pergunta</button>
+        <button type="button" class="primary" id="finishAdult" ${adultReady() ? '' : 'disabled'}>Ver o resultado</button>
+      </div>
+    </div>`;
+    app.querySelectorAll('.judge-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = Number(button.dataset.q);
+        adultMarks[index] = button.dataset.judge === '1';
+        const box = button.parentElement;
+        box.querySelectorAll('.judge-btn').forEach((item) => item.classList.toggle('on', item === button));
+        app.querySelector('#finishAdult').disabled = !adultReady();
+      });
+    });
+    app.querySelector('#backToChild').addEventListener('click', () => {
+      questionIndex = current.questions.length - 1;
+      stage = 'quiz';
+      render();
+      moveTop();
+    });
+    app.querySelector('#finishAdult').addEventListener('click', () => { if (adultReady()) grade(); });
+  }
+
+  function resultItems() {
+    return current.questions.map((q, i) => {
+      let ok = false;
+      let media = '';
+      let small = '';
+      if (q.mode === 'x') {
+        ok = answers[i].choice === q.correct;
+        const right = Array.isArray(q.options) ? q.options[q.correct] : '';
+        small = ok ? 'Acertou.' : `Errou. A resposta é “${escapeText(right || '')}”.`;
+        if (typeof q.line === 'number' && current.lines[q.line]) small += ` No texto: “${escapeText(current.lines[q.line])}”.`;
+      } else if (q.mode === 'caneta') {
+        ok = adultMarks[i] === true;
+        if (answers[i].image) media = `<img class="child-draw" alt="Resposta escrita à mão" src="${answers[i].image}">`;
+        small = ok ? 'O adulto marcou: certo.' : 'O adulto marcou: errado.';
+        if (!ok && q.expect) small += ` Resposta esperada: ${escapeText(q.expect)}.`;
+      } else {
+        ok = adultMarks[i] === true;
+        small = `Escreveu: “${escapeText(answers[i].text || '—')}”. ${ok ? 'O adulto marcou: certo.' : 'O adulto marcou: errado.'}`;
+        if (!ok && q.expect) small += ` Resposta esperada: ${escapeText(q.expect)}.`;
+      }
+      return `<div class="result-item ${ok ? 'good' : 'bad'}"><span class="status-dot" aria-hidden="true">${ok ? '✓' : '×'}</span><div><strong>${i + 1}. ${escapeText(q.text)}</strong>${media}<small>${small}</small></div></div>`;
+    }).join('');
+  }
+  function renderResult() {
+    const total = current.questions.length;
+    const score = scoreOf();
+    const stats = progress[current.id];
+    const cheer = score === total ? 'Você leu com muita atenção!' : score * 2 >= total ? 'Muito bem! Vamos ver as respostas.' : 'Boa tentativa! Leia de novo com calma.';
+    const auto = autoCount();
+    const humanTotal = total - auto.total;
+    const breakdown = humanTotal > 0 && auto.total > 0
+      ? `<p class="helper">Sistema: ${auto.score} de ${auto.total} · Adulto: ${score - auto.score} de ${humanTotal}</p>` : '';
+    app.innerHTML = `<div class="panel">
+      <div class="results-head">
+        <div class="result-icon" aria-hidden="true">${score === total ? '★' : '✓'}</div>
+        <div class="eyebrow">Fim da atividade</div>
+        <h1 class="result-number">${score} de ${total} acertos</h1>
+        <p class="result-comment">${cheer}</p>
+        ${breakdown}
+        ${stats ? `<p class="helper">Melhor nota neste navegador: ${stats.best} de ${stats.total}</p>` : ''}
+      </div>
+      <div class="result-list">${resultItems()}</div>
+      <div class="button-row">
+        <button type="button" class="primary" id="tryAgain">Ler e fazer de novo</button>
+        <button type="button" class="secondary" id="exportDone">Exportar tarefa feita</button>
+        <button type="button" class="secondary" id="backLevel">Voltar às histórias</button>
+      </div>
+    </div>`;
+    app.querySelector('#tryAgain').addEventListener('click', () => {
+      answers = blankAnswers(current);
+      questionIndex = 0;
+      viewStory = false;
+      savedThisRound = false;
+      adultMarks = [];
+      stage = 'read';
+      render();
+      moveTop();
+    });
+    app.querySelector('#exportDone').addEventListener('click', () => downloadSheet(true));
+    app.querySelector('#backLevel').addEventListener('click', goLevel);
+  }
+
+  function sheetStamp() {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+  function sheetWhen() {
+    return new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  }
+  function sheetQuestionBlank(q, i) {
+    let space = '';
+    if (q.mode === 'x') {
+      const options = Array.isArray(q.options) ? q.options : [];
+      space = `<div class="opts">${options.map((option) => `<div class="opt"><span class="box"></span><span>${escapeText(option)}</span></div>`).join('')}</div>`;
+    } else if (q.mode === 'caneta') {
+      space = '<div class="write-box"></div>';
+    } else {
+      space = '<div class="lines"><span></span><span></span><span></span></div>';
+    }
+    return `<section class="q"><h2>${i + 1}. ${escapeText(q.text)}</h2>${space}</section>`;
+  }
+  function sheetQuestionDone(q, i) {
+    let ok = false;
+    let detail = '';
+    let media = '';
+    if (q.mode === 'x') {
+      ok = answers[i].choice === q.correct;
+      const chosen = Array.isArray(q.options) && answers[i].choice != null ? q.options[answers[i].choice] : '';
+      const right = Array.isArray(q.options) ? q.options[q.correct] : '';
+      detail = `Marcou: ${escapeText(chosen || '—')}. ${ok ? 'Acertou.' : `Errou. A resposta é “${escapeText(right || '')}”.`}`;
+      if (typeof q.line === 'number' && current.lines[q.line]) detail += ` No texto: “${escapeText(current.lines[q.line])}”.`;
+    } else if (q.mode === 'caneta') {
+      ok = adultMarks[i] === true;
+      if (answers[i].image) media = `<img alt="Resposta escrita à mão" src="${answers[i].image}">`;
+      detail = ok ? 'O adulto marcou: certo.' : 'O adulto marcou: errado.';
+      if (!ok && q.expect) detail += ` Resposta esperada: ${escapeText(q.expect)}.`;
+    } else {
+      ok = adultMarks[i] === true;
+      detail = `Escreveu: “${escapeText(answers[i].text || '—')}”. ${ok ? 'O adulto marcou: certo.' : 'O adulto marcou: errado.'}`;
+      if (!ok && q.expect) detail += ` Resposta esperada: ${escapeText(q.expect)}.`;
+    }
+    return `<section class="q ${ok ? 'good' : 'bad'}"><h2>${i + 1}. ${escapeText(q.text)}</h2>${media}<p>${detail}</p></section>`;
+  }
+  function downloadSheet(done) {
+    const level = levelById(current.level);
+    const total = current.questions.length;
+    const score = done ? scoreOf() : 0;
+    const title = done ? `${current.title} — tarefa feita` : `${current.title} — em branco`;
+    const questions = current.questions.map((q, i) => (done ? sheetQuestionDone(q, i) : sheetQuestionBlank(q, i))).join('');
+    const lines = current.lines.map((line, i) => `<p><span>${i + 1}</span>${escapeText(line)}</p>`).join('');
+    const head = done
+      ? `<p class="score">${score} de ${total} acertos</p><p class="who">Nome: <i></i> &nbsp;&nbsp; Data: ${escapeText(sheetWhen())}</p>`
+      : '<p class="who">Nome: <i></i> &nbsp;&nbsp; Data: <i></i></p>';
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeText(title)}</title><style>
+      body{margin:0;background:#f8f8f2;color:#22313a;font-family:Verdana,Arial,sans-serif}
+      main{max-width:760px;margin:auto;padding:28px 20px 48px}
+      h1{font-size:28px;letter-spacing:-.6px;margin:8px 0}
+      .kicker{color:#285f82;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+      .who{color:#61717c;font-size:15px}
+      .who i{display:inline-block;width:180px;border-bottom:1px solid #9aa9ac;height:1.1em;vertical-align:bottom}
+      .score{font-size:22px;font-weight:900;margin:8px 0}
+      .story p{display:flex;gap:12px;border:1px solid #dee6e9;border-radius:12px;padding:12px 14px;background:#fff;font-size:20px;font-weight:700;line-height:1.4}
+      .story span{color:#9aa9ac;width:22px;flex:none}
+      .q{background:#fff;border:1px solid #dee6e9;border-radius:14px;padding:14px 16px;margin-top:12px}
+      .q h2{font-size:18px;margin:0 0 10px}
+      .q.good{background:#e8f6ee;border-color:#d0e7d8}
+      .q.bad{background:#fff0ee;border-color:#f3d8d3}
+      .opt{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin:8px 0}
+      .box{width:22px;height:22px;border:2px solid #22313a;border-radius:4px;flex:none}
+      .lines span{display:block;border-bottom:1px solid #9aa9ac;height:34px}
+      .write-box{height:160px;border:2px solid #cfdbdf;border-radius:12px;background:#fff}
+      img{max-width:100%;background:#fff;border:1px solid #dee6e9;border-radius:12px}
+      .foot{color:#7e8c90;font-size:12px;margin-top:22px}
+      @media print{body{background:#fff}main{padding:0}.q,.story p{break-inside:avoid}}
+    </style></head><body><main>
+      <div class="kicker">Hora de Ler${level ? ` · ${escapeText(level.title)}` : ''}</div>
+      <h1>${escapeText(current.title)}</h1>
+      ${head}
+      <div class="story">${lines}</div>
+      ${questions}
+      <p class="foot">${done ? 'Tarefa feita, guardada neste arquivo.' : 'Tarefa em branco, para imprimir ou fazer no papel.'}</p>
+    </main></body></html>`;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = done
+      ? `hora-de-ler-${current.id}-feita-${sheetStamp()}.html`
+      : `hora-de-ler-${current.id}-em-branco.html`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  function openLevel(id) {
+    levelId = id;
+    stage = 'level';
+    current = null;
+    render();
+    moveTop();
+  }
+  function openActivity(id) {
+    current = activities.find((item) => item.id === id) || null;
+    if (!current) return;
+    answers = blankAnswers(current);
+    questionIndex = 0;
+    viewStory = false;
+    savedThisRound = false;
+    adultMarks = [];
+    stage = 'read';
+    render();
+    moveTop();
+  }
+  function goLevel() {
+    if (!levelId) return goHome();
+    stage = 'level';
+    current = null;
+    render();
+    moveTop();
+  }
+  function goHome() {
+    stage = 'home';
+    current = null;
+    levelId = null;
+    render();
+    moveTop();
+  }
+
+  document.getElementById('brandHome').addEventListener('click', goHome);
+  homeButton.addEventListener('click', goHome);
+  applyFont();
+  render();
+})();
+</script>
+</body>
+</html>
