@@ -1,12 +1,13 @@
 /* Hora de Ler — funciona offline depois da primeira abertura online. */
-const CACHE = 'hora-de-ler-v3';
+const CACHE = 'hora-de-ler-v4';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -27,7 +28,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.origin !== self.location.origin && !url.hostname.includes('fonts.g')) {
+  if (url.origin !== self.location.origin && !url.hostname.includes('fonts.g') && !url.hostname.includes('jsdelivr.net')) {
     return;
   }
   event.respondWith((async () => {

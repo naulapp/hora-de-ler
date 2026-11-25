@@ -131,6 +131,29 @@
     .result-item strong { display: block; margin-bottom: 6px; font-size: 15px; line-height: 1.5; }
     .result-item small { font-size: 14px; line-height: 1.55; color: #42505a; }
     .footer { color: #7e8c90; text-align: center; font-size: 12px; padding: 15px 20px 28px; line-height: 1.5; }
+    .export-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .sheet-paper {
+      background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px 20px 28px;
+      box-shadow: var(--shadow); color: #22313a;
+    }
+    .sheet-paper .kicker { color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .sheet-paper h1 { font-size: 28px; letter-spacing: -.6px; margin: 8px 0; }
+    .sheet-paper .who { color: var(--muted); font-size: 15px; }
+    .sheet-paper .who i { display: inline-block; width: 160px; border-bottom: 1px solid #9aa9ac; height: 1.1em; vertical-align: bottom; }
+    .sheet-paper .score { font-size: 22px; font-weight: 900; margin: 8px 0; }
+    .sheet-paper .story p { display: flex; gap: 12px; border: 1px solid #dee6e9; border-radius: 12px; padding: 12px 14px; background: #fcfdfa; font-size: 20px; font-weight: 700; line-height: 1.4; margin: 0 0 10px; }
+    .sheet-paper .story span { color: #9aa9ac; width: 22px; flex: none; }
+    .sheet-paper .q { background: #fff; border: 1px solid #dee6e9; border-radius: 14px; padding: 14px 16px; margin-top: 12px; }
+    .sheet-paper .q h2 { font-size: 18px; margin: 0 0 10px; }
+    .sheet-paper .q.good { background: var(--green-pale); border-color: #d0e7d8; }
+    .sheet-paper .q.bad { background: var(--red-pale); border-color: #f3d8d3; }
+    .sheet-paper .opt { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; margin: 8px 0; }
+    .sheet-paper .box { width: 22px; height: 22px; border: 2px solid #22313a; border-radius: 4px; flex: none; }
+    .sheet-paper .lines span { display: block; border-bottom: 1px solid #9aa9ac; height: 34px; }
+    .sheet-paper .write-box { height: 140px; border: 2px solid #cfdbdf; border-radius: 12px; background: #fff; }
+    .sheet-paper img { max-width: 100%; background: #fff; border: 1px solid #dee6e9; border-radius: 12px; }
+    .sheet-paper .foot { color: #7e8c90; font-size: 12px; margin-top: 22px; }
+    .export-busy { opacity: .65; pointer-events: none; }
     @media (max-width: 720px) {
       .lesson { min-height: 0; display: grid; grid-template-columns: 66px 1fr; column-gap: 14px; align-items: center; padding: 15px; }
       .lesson-art { grid-row: span 3; margin-bottom: 0; }
@@ -149,9 +172,11 @@
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     @media print {
       body { background: white; }
-      .topbar, .footer, .button-row, .read-tools, .sizes, .type-tools, .text-toggle, .note, .quiz-progress, .answers, .tools, .pad, .judge { display: none !important; }
-      .wrap { width: 100%; }
-      .panel { border: none; box-shadow: none; }
+      .topbar, .footer, .export-actions, .button-row, .read-tools, .sizes, .type-tools, .text-toggle, .note, .quiz-progress, .answers, .tools, .pad, .judge, .eyebrow, .helper { display: none !important; }
+      .wrap { width: 100%; max-width: none; }
+      .panel { border: none; box-shadow: none; padding: 0; }
+      .sheet-paper { box-shadow: none; border: none; padding: 0; }
+      .sheet-paper .q, .sheet-paper .story p { break-inside: avoid; }
     }
   </style>
 </head>
@@ -214,112 +239,169 @@
 
   const activities = [
     {
+      id: 'lia-tico', level: 's2', title: 'Lia e o gato Tico', icon: '🐈',
+      lines: ['Lia tem um gato.', 'O gato se chama Tico.', 'Tico gosta de brincar com uma bola.'],
+      questions: [
+        { mode: 'x', text: 'Quem tem um gato?', options: ['Tico', 'Lia', 'Bola'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Como se chama o gato?', options: ['Tico', 'Bola', 'Lia'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Com o que Tico gosta de brincar?', options: ['Pipa', 'Carrinho', 'Bola'], correct: 2, line: 2 }
+      ]
+    },
+    {
       id: 'gato', level: 's2', title: 'O gato de Bia', icon: '🐈',
       lines: ['A Bia ama o gato.', 'O gato mia na sala.', 'A Bia dá a bola ao gato.', 'O gato rola a bola.'],
       questions: [
-        { mode: 'x', text: 'A Bia ama o gato ou o sapo?', options: ['O gato', 'O sapo'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O gato mia na sala ou na rua?', options: ['Na sala', 'Na rua'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Bia dá a bola ou a mala?', options: ['A mala', 'A bola'], correct: 1, line: 2 },
-        { mode: 'x', text: 'O gato rola a bola ou pula?', options: ['Pula', 'Rola a bola'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem ama o gato?', options: ['A Bia', 'O sapo', 'A bola'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Onde o gato mia?', options: ['Na rua', 'Na sala', 'No lago'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a Bia dá ao gato?', options: ['A mala', 'A pipa', 'A bola'], correct: 2, line: 2 },
+        { mode: 'x', text: 'O que o gato rola?', options: ['A bola', 'A mala', 'A uva'], correct: 0, line: 3 }
       ]
     },
     {
       id: 'pato', level: 's2', title: 'O pato no lago', icon: '🦆',
       lines: ['O pato nada no lago.', 'A Lili vê o pato.', 'A Lili joga a bola.', 'O pato nada até a bola.'],
       questions: [
-        { mode: 'x', text: 'O pato nada no lago ou na sala?', options: ['Na sala', 'No lago'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A Lili vê o pato ou o gato?', options: ['O pato', 'O gato'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Lili joga a bola ou a mala?', options: ['A bola', 'A mala'], correct: 0, line: 2 },
-        { mode: 'x', text: 'O pato nada ou pula?', options: ['Pula', 'Nada'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Onde o pato nada?', options: ['Na sala', 'No lago', 'Na rua'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Quem vê o pato?', options: ['A Lili', 'O gato', 'A Bia'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O que a Lili joga?', options: ['A mala', 'A bola', 'A uva'], correct: 1, line: 2 },
+        { mode: 'x', text: 'Até onde o pato nada?', options: ['Até a bola', 'Até a casa', 'Até a mala'], correct: 0, line: 3 }
       ]
     },
     {
       id: 'pipa', level: 's2', title: 'A pipa de Lila', icon: '🪁',
       lines: ['A Lila pega a pipa.', 'A pipa é da Lila.', 'A pipa voa na rua.', 'A Lila vê a pipa.'],
       questions: [
-        { mode: 'x', text: 'A Lila pega a pipa ou a bola?', options: ['A bola', 'A pipa'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A pipa é da Lila ou da Bia?', options: ['Da Lila', 'Da Bia'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A pipa voa na rua ou na sala?', options: ['Na rua', 'Na sala'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Lila vê a pipa ou o pato?', options: ['O pato', 'A pipa'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem pega a pipa?', options: ['A Bia', 'A Lila', 'O pato'], correct: 1, line: 0 },
+        { mode: 'x', text: 'De quem é a pipa?', options: ['Da Lila', 'Da Bia', 'Do Duda'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Onde a pipa voa?', options: ['Na sala', 'No lago', 'Na rua'], correct: 2, line: 2 },
+        { mode: 'x', text: 'O que a Lila vê?', options: ['O pato', 'A pipa', 'A bola'], correct: 1, line: 3 }
       ]
     },
     {
       id: 'uva', level: 's2', title: 'A uva da Lili', icon: '🍇',
       lines: ['A Lili pega a uva.', 'A uva é da Lili.', 'A Lili come a uva.', 'A Lili ama a uva.'],
       questions: [
-        { mode: 'x', text: 'A Lili pega a uva ou a bola?', options: ['A bola', 'A uva'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A uva é da Lili ou da Bia?', options: ['Da Lili', 'Da Bia'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Lili come a uva ou a bola?', options: ['A uva', 'A bola'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Lili ama a uva ou o gato?', options: ['O gato', 'A uva'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem pega a uva?', options: ['A Bia', 'A Lili', 'O gato'], correct: 1, line: 0 },
+        { mode: 'x', text: 'De quem é a uva?', options: ['Da Lili', 'Da Bia', 'Do pato'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O que a Lili come?', options: ['A bola', 'A uva', 'A mala'], correct: 1, line: 2 },
+        { mode: 'x', text: 'O que a Lili ama?', options: ['O gato', 'A pipa', 'A uva'], correct: 2, line: 3 }
+      ]
+    },
+    {
+      id: 'sapo', level: 's2', title: 'O sapo na lama', icon: '🐸',
+      lines: ['O sapo pula na lama.', 'O sapo come a mosca.', 'A Bia vê o sapo.', 'O sapo pula de novo.'],
+      questions: [
+        { mode: 'x', text: 'Quem pula na lama?', options: ['O sapo', 'O pato', 'A Bia'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que o sapo come?', options: ['A uva', 'A mosca', 'A bola'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Quem vê o sapo?', options: ['A Lili', 'O gato', 'A Bia'], correct: 2, line: 2 }
+      ]
+    },
+    {
+      id: 'bola-leo', level: 's2', title: 'A bola do Léo', icon: '⚽',
+      lines: ['O Léo tem uma bola.', 'A bola é azul.', 'O Léo joga a bola.', 'A bola cai na rua.'],
+      questions: [
+        { mode: 'x', text: 'Quem tem uma bola?', options: ['A Bia', 'O Léo', 'O pato'], correct: 1, line: 0 },
+        { mode: 'x', text: 'De que cor é a bola?', options: ['Azul', 'Verde', 'Rosa'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Onde a bola cai?', options: ['Na sala', 'No lago', 'Na rua'], correct: 2, line: 2 }
       ]
     },
     {
       id: 'macaco', level: 's2', title: 'O macaco', icon: '🐵',
       lines: ['O macaco pega a banana.', 'A banana é do macaco.', 'O macaco come a banana.', 'O macaco pula na sala.'],
       questions: [
-        { mode: 'x', text: 'O macaco pega a banana ou a bola?', options: ['A bola', 'A banana'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A banana é do macaco ou da Lili?', options: ['Do macaco', 'Da Lili'], correct: 0, line: 1 },
-        { mode: 'x', text: 'O macaco come a banana ou a uva?', options: ['A banana', 'A uva'], correct: 0, line: 2 },
-        { mode: 'x', text: 'O macaco pula na sala ou na rua?', options: ['Na rua', 'Na sala'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem pega a banana?', options: ['O pato', 'O macaco', 'A Lili'], correct: 1, line: 0 },
+        { mode: 'x', text: 'De quem é a banana?', options: ['Do macaco', 'Da Lili', 'Da Bia'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O que o macaco come?', options: ['A uva', 'A bola', 'A banana'], correct: 2, line: 2 },
+        { mode: 'x', text: 'Onde o macaco pula?', options: ['Na rua', 'Na sala', 'No mar'], correct: 1, line: 3 }
       ]
     },
     {
       id: 'menina', level: 's2', title: 'A menina e a boneca', icon: '👧',
       lines: ['A menina pega a boneca.', 'A boneca é da menina.', 'A menina ama a boneca.', 'A menina leva a boneca na mala.'],
       questions: [
-        { mode: 'x', text: 'A menina pega a boneca ou a pipa?', options: ['A boneca', 'A pipa'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A boneca é da menina ou do Duda?', options: ['Do Duda', 'Da menina'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A menina ama a boneca ou o pato?', options: ['A boneca', 'O pato'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A menina leva a boneca na mala ou na sala?', options: ['Na sala', 'Na mala'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem pega a boneca?', options: ['A menina', 'O Duda', 'A Lila'], correct: 0, line: 0 },
+        { mode: 'x', text: 'De quem é a boneca?', options: ['Do Duda', 'Da menina', 'Da Bia'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a menina ama?', options: ['O pato', 'A pipa', 'A boneca'], correct: 2, line: 2 },
+        { mode: 'x', text: 'Onde a menina leva a boneca?', options: ['Na sala', 'Na mala', 'Na rua'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'mimi', level: 's3', title: 'O gato Mimi', icon: '🐱',
+      lines: ['Mimi é um gato.', 'Mimi dorme na cama.', 'Depois, ele bebe leite.', 'Mimi é macio.'],
+      questions: [
+        { mode: 'texto', text: 'Quem é Mimi?', expect: 'Um gato' },
+        { mode: 'texto', text: 'Onde Mimi dorme?', expect: 'Na cama' },
+        { mode: 'texto', text: 'O que Mimi bebe?', expect: 'Leite' },
+        { mode: 'x', text: 'Mimi é', options: ['Gato', 'Pato', 'Sapo'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Qual palavra apareceu no texto?', options: ['Leite', 'Porta', 'Bola'], correct: 0, line: 2 }
       ]
     },
     {
       id: 'pao', level: 's3', title: 'O pão no prato', icon: '🍞',
       lines: ['A Bia põe o pão no prato.', 'O pão é da Bia.', 'A Bia come o pão.', 'A Bia lava o prato.'],
       questions: [
-        { mode: 'x', text: 'A Bia põe o pão ou a uva no prato?', options: ['O pão', 'A uva'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O pão é da Bia ou da Lili?', options: ['Da Lili', 'Da Bia'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A Bia come o pão ou a banana?', options: ['O pão', 'A banana'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Bia lava o prato ou a mala?', options: ['A mala', 'O prato'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem põe o pão no prato?', options: ['A Bia', 'A Lili', 'O Duda'], correct: 0, line: 0 },
+        { mode: 'x', text: 'De quem é o pão?', options: ['Da Lili', 'Da Bia', 'Do pato'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a Bia come?', options: ['A banana', 'A uva', 'O pão'], correct: 2, line: 2 },
+        { mode: 'x', text: 'O que a Bia lava?', options: ['A mala', 'O prato', 'A bola'], correct: 1, line: 3 }
       ]
     },
     {
       id: 'mar', level: 's3', title: 'O pato no mar', icon: '🌊',
       lines: ['O pato nada no mar.', 'O sol cai no mar.', 'A Lili vê o pato.', 'A Lili ama o pato.'],
       questions: [
-        { mode: 'x', text: 'O pato nada no mar ou no lago?', options: ['No lago', 'No mar'], correct: 1, line: 0 },
-        { mode: 'x', text: 'O sol cai no mar ou na sala?', options: ['No mar', 'Na sala'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Lili vê o pato ou o gato?', options: ['O gato', 'O pato'], correct: 1, line: 2 },
-        { mode: 'x', text: 'A Lili ama o pato ou a mala?', options: ['O pato', 'A mala'], correct: 0, line: 3 }
+        { mode: 'x', text: 'Onde o pato nada?', options: ['No lago', 'No mar', 'Na sala'], correct: 1, line: 0 },
+        { mode: 'x', text: 'O que cai no mar?', options: ['O sol', 'A bola', 'A mala'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Quem vê o pato?', options: ['A Bia', 'O gato', 'A Lili'], correct: 2, line: 2 },
+        { mode: 'x', text: 'Quem ama o pato?', options: ['A Lili', 'A Bia', 'O Duda'], correct: 0, line: 3 }
       ]
     },
     {
       id: 'porta', level: 's3', title: 'A porta da sala', icon: '🚪',
       lines: ['O Duda abre a porta.', 'A bola está na sala.', 'O Duda pega a bola.', 'O Duda joga a bola.'],
       questions: [
-        { mode: 'x', text: 'O Duda abre a porta ou a mala?', options: ['A mala', 'A porta'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A bola está na sala ou na rua?', options: ['Na sala', 'Na rua'], correct: 0, line: 1 },
-        { mode: 'x', text: 'O Duda pega a bola ou o prato?', options: ['A bola', 'O prato'], correct: 0, line: 2 },
-        { mode: 'x', text: 'O Duda joga a bola ou a carta?', options: ['A carta', 'A bola'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem abre a porta?', options: ['A Lila', 'O Duda', 'A Bia'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Onde está a bola?', options: ['Na sala', 'Na rua', 'No mar'], correct: 0, line: 1 },
+        { mode: 'x', text: 'O que o Duda pega?', options: ['O prato', 'A carta', 'A bola'], correct: 2, line: 2 },
+        { mode: 'x', text: 'O que o Duda joga?', options: ['A carta', 'A bola', 'A mala'], correct: 1, line: 3 }
       ]
     },
     {
       id: 'carta', level: 's3', title: 'A carta da vovó', icon: '✉️',
       lines: ['A vovó manda a carta.', 'A carta é da vovó.', 'A Lila lê a carta.', 'A Lila ama a vovó.'],
       questions: [
-        { mode: 'x', text: 'A vovó manda a carta ou a bola?', options: ['A carta', 'A bola'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A carta é da vovó ou da Lila?', options: ['Da Lila', 'Da vovó'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A Lila lê a carta ou o prato?', options: ['A carta', 'O prato'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Lila ama a vovó ou o pato?', options: ['O pato', 'A vovó'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem manda a carta?', options: ['A vovó', 'A Lila', 'A Bia'], correct: 0, line: 0 },
+        { mode: 'x', text: 'De quem é a carta?', options: ['Da Lila', 'Da vovó', 'Do Duda'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Quem lê a carta?', options: ['A Lila', 'A Bia', 'O pato'], correct: 0, line: 2 },
+        { mode: 'texto', text: 'Quem a Lila ama?', expect: 'A vovó' }
+      ]
+    },
+    {
+      id: 'formiga', level: 's3', title: 'A formiga Juju', icon: '🐜',
+      lines: ['Juju é uma formiga.', 'Juju leva uma folha.', 'A formiga sobe no tronco.', 'Juju trabalha o dia todo.'],
+      questions: [
+        { mode: 'x', text: 'Quem é Juju?', options: ['Uma formiga', 'Um sapo', 'Um pato'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que Juju leva?', options: ['Uma bola', 'Uma folha', 'Uma uva'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Onde a formiga sobe?', options: ['No tronco', 'Na cama', 'Na mesa'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra formiga.', expect: 'formiga' }
+      ]
+    },
+    {
+      id: 'peixe', level: 's3', title: 'O peixe no prato', icon: '🐟',
+      lines: ['O peixe nada no prato.', 'A Bia come o peixe.', 'O peixe é fresco.', 'A Bia lava o prato.'],
+      questions: [
+        { mode: 'x', text: 'O que nada no prato?', options: ['O peixe', 'O pato', 'O gato'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Quem come o peixe?', options: ['A Lili', 'A Bia', 'O Duda'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Como é o peixe?', options: ['Fresco', 'Azul', 'Grande'], correct: 0, line: 2 }
       ]
     },
     {
       id: 'flores', level: 'sall', title: 'Três flores', icon: '🌸',
       lines: ['A Lila tem três flores.', 'A flor branca é grande.', 'A Lila brinca com a flor.', 'A Lila ama as flores.'],
       questions: [
-        { mode: 'x', text: 'A Lila tem três flores ou três bolas?', options: ['Três flores', 'Três bolas'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A flor branca é grande ou pequena?', options: ['É pequena', 'É grande'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A Lila brinca com a flor ou com o pato?', options: ['Com a flor', 'Com o pato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Quantas flores a Lila tem?', options: ['Duas', 'Três', 'Quatro'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Como é a flor branca?', options: ['Pequena', 'Azul', 'Grande'], correct: 2, line: 1 },
+        { mode: 'x', text: 'Com o que a Lila brinca?', options: ['Com a flor', 'Com o pato', 'Com a bola'], correct: 0, line: 2 },
         { mode: 'caneta', text: 'Escreva a palavra flor.', expect: 'flor' }
       ]
     },
@@ -327,9 +409,9 @@
       id: 'brinquedo', level: 'sall', title: 'O brinquedo', icon: '🧸',
       lines: ['O menino pega o brinquedo.', 'O brinquedo é grande.', 'O menino brinca na sala.', 'O menino guarda o brinquedo.'],
       questions: [
-        { mode: 'x', text: 'O menino pega o brinquedo ou a bola?', options: ['A bola', 'O brinquedo'], correct: 1, line: 0 },
-        { mode: 'x', text: 'O brinquedo é grande ou pequeno?', options: ['É grande', 'É pequeno'], correct: 0, line: 1 },
-        { mode: 'x', text: 'O menino brinca na sala ou na rua?', options: ['Na rua', 'Na sala'], correct: 1, line: 2 },
+        { mode: 'x', text: 'Quem pega o brinquedo?', options: ['A menina', 'O menino', 'A Bia'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Como é o brinquedo?', options: ['Grande', 'Pequeno', 'Azul'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Onde o menino brinca?', options: ['Na rua', 'No mar', 'Na sala'], correct: 2, line: 2 },
         { mode: 'texto', text: 'Quem guarda o brinquedo?', expect: 'O menino' }
       ]
     },
@@ -337,19 +419,39 @@
       id: 'planta', level: 'sall', title: 'A planta grande', icon: '🌱',
       lines: ['O gato sobe na planta.', 'A planta é grande.', 'A planta tem uma flor branca.', 'A Bia pega o gato.'],
       questions: [
-        { mode: 'x', text: 'O gato sobe na planta ou na mesa?', options: ['Na planta', 'Na mesa'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A planta é grande ou pequena?', options: ['É pequena', 'É grande'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A planta tem uma flor branca ou uma bola?', options: ['Uma flor branca', 'Uma bola'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Bia pega o gato ou o pato?', options: ['O pato', 'O gato'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Quem sobe na planta?', options: ['O gato', 'O pato', 'A Bia'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Como é a planta?', options: ['Pequena', 'Grande', 'Azul'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a planta tem?', options: ['Uma bola', 'Uma mala', 'Uma flor branca'], correct: 2, line: 2 },
+        { mode: 'x', text: 'Quem pega o gato?', options: ['A Lili', 'A Bia', 'O Duda'], correct: 1, line: 3 }
+      ]
+    },
+    {
+      id: 'bicicleta', level: 'sall', title: 'A bicicleta', icon: '🚲',
+      lines: ['O menino anda de bicicleta.', 'A bicicleta é vermelha.', 'Ele passa pela praça.', 'A mãe espera na porta.'],
+      questions: [
+        { mode: 'x', text: 'Quem anda de bicicleta?', options: ['A menina', 'O menino', 'A mãe'], correct: 1, line: 0 },
+        { mode: 'x', text: 'De que cor é a bicicleta?', options: ['Azul', 'Verde', 'Vermelha'], correct: 2, line: 1 },
+        { mode: 'x', text: 'Por onde ele passa?', options: ['Pela praça', 'Pelo mar', 'Pela sala'], correct: 0, line: 2 },
+        { mode: 'texto', text: 'Quem espera na porta?', expect: 'A mãe' }
+      ]
+    },
+    {
+      id: 'escola', level: 'sall', title: 'O dia na escola', icon: '🏫',
+      lines: ['A Bia vai para a escola.', 'Ela leva a mochila azul.', 'Na escola, a Bia lê um livro.', 'Depois, ela brinca no pátio.'],
+      questions: [
+        { mode: 'x', text: 'Para onde a Bia vai?', options: ['Para a escola', 'Para o mar', 'Para a feira'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que a Bia leva?', options: ['Uma bola', 'A mochila azul', 'Um peixe'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a Bia lê?', options: ['Um livro', 'Uma carta', 'Uma lista'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra escola.', expect: 'escola' }
       ]
     },
     {
       id: 'coelho', level: 'lh', title: 'O coelho e a folha', icon: '🐰',
       lines: ['O coelho pula na folha.', 'O coelho come a folha.', 'A Lila olha o coelho.', 'O olho do coelho é preto.'],
       questions: [
-        { mode: 'x', text: 'O coelho pula na folha ou na bola?', options: ['Na bola', 'Na folha'], correct: 1, line: 0 },
-        { mode: 'x', text: 'O coelho come a folha ou a banana?', options: ['A folha', 'A banana'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Lila olha o coelho ou o pato?', options: ['O pato', 'O coelho'], correct: 1, line: 2 },
+        { mode: 'x', text: 'Quem pula na folha?', options: ['O pato', 'O coelho', 'A Lila'], correct: 1, line: 0 },
+        { mode: 'x', text: 'O que o coelho come?', options: ['A folha', 'A banana', 'A uva'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Qual palavra tem LH?', options: ['Pato', 'Bola', 'Folha'], correct: 2, line: 0 },
         { mode: 'caneta', text: 'Escreva a palavra folha.', expect: 'folha' }
       ]
     },
@@ -357,39 +459,48 @@
       id: 'toalha', level: 'lh', title: 'A toalha da Lili', icon: '🧺',
       lines: ['A toalha da Lili está molhada.', 'A toalha está na palha.', 'A Lili pega a toalha.', 'A Lili dobra a toalha.'],
       questions: [
-        { mode: 'x', text: 'A toalha da Lili está molhada ou seca?', options: ['Molhada', 'Seca'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A toalha está na palha ou na mala?', options: ['Na mala', 'Na palha'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A Lili pega a toalha ou a bola?', options: ['A toalha', 'A bola'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Lili dobra a toalha ou a carta?', options: ['A carta', 'A toalha'], correct: 1, line: 3 }
+        { mode: 'x', text: 'Como está a toalha?', options: ['Molhada', 'Seca', 'Azul'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Onde está a toalha?', options: ['Na mala', 'Na palha', 'Na cama'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Quem pega a toalha?', options: ['A Lili', 'A Bia', 'O Duda'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Qual palavra tem LH?', options: ['Toalha', 'Bola', 'Pato'], correct: 0, line: 0 }
       ]
     },
     {
       id: 'milho', level: 'lh', title: 'O milho da Bia', icon: '🌽',
       lines: ['A Bia colhe o milho.', 'A Bia tira a palha.', 'O milho é amarelo.', 'A Bia leva o milho para casa.'],
       questions: [
-        { mode: 'x', text: 'A Bia colhe o milho ou a uva?', options: ['O milho', 'A uva'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A Bia tira a palha ou a bola?', options: ['A bola', 'A palha'], correct: 1, line: 1 },
-        { mode: 'x', text: 'O milho é amarelo ou azul?', options: ['Amarelo', 'Azul'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Quem colhe o milho?', options: ['A Bia', 'A Lili', 'O Duda'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que a Bia tira?', options: ['A bola', 'A palha', 'A uva'], correct: 1, line: 1 },
+        { mode: 'x', text: 'De que cor é o milho?', options: ['Azul', 'Verde', 'Amarelo'], correct: 2, line: 2 },
         { mode: 'texto', text: 'Quem colhe o milho?', expect: 'A Bia' }
+      ]
+    },
+    {
+      id: 'filho-olho', level: 'lh', title: 'O filho e o olho', icon: '👁️',
+      lines: ['O filho da Lia olha a folha.', 'O olho dele é castanho.', 'Ele acha a folha bonita.', 'A Lia abraça o filho.'],
+      questions: [
+        { mode: 'x', text: 'Quem olha a folha?', options: ['O filho da Lia', 'O pato', 'O gato'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Como é o olho dele?', options: ['Azul', 'Castanho', 'Verde'], correct: 1, line: 1 },
+        { mode: 'caneta', text: 'Escreva uma palavra com LH.', expect: 'folha' }
       ]
     },
     {
       id: 'ninho', level: 'nh', title: 'O ninho', icon: '🐦',
       lines: ['O passarinho faz o ninho.', 'O ninho fica na árvore.', 'O passarinho volta ao ninho.', 'A Lila não pega o ninho.'],
       questions: [
-        { mode: 'x', text: 'O passarinho faz o ninho ou a bola?', options: ['O ninho', 'A bola'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O ninho fica na árvore ou na sala?', options: ['Na sala', 'Na árvore'], correct: 1, line: 1 },
-        { mode: 'x', text: 'O passarinho volta ao ninho ou ao mar?', options: ['Ao ninho', 'Ao mar'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Lila pega o ninho?', options: ['Não', 'Sim'], correct: 0, line: 3 }
+        { mode: 'x', text: 'Quem faz o ninho?', options: ['O passarinho', 'A Lila', 'O gato'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Onde fica o ninho?', options: ['Na sala', 'Na árvore', 'Na cama'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Qual palavra tem NH?', options: ['Bola', 'Pato', 'Ninho'], correct: 2, line: 0 },
+        { mode: 'x', text: 'A Lila pega o ninho?', options: ['Não', 'Sim', 'Talvez'], correct: 0, line: 3 }
       ]
     },
     {
       id: 'banho', level: 'nh', title: 'O banho', icon: '🛁',
       lines: ['O menino toma banho de manhã.', 'O banho é quente.', 'O menino ganha um pato.', 'O menino brinca no banho.'],
       questions: [
-        { mode: 'x', text: 'O menino toma banho de manhã ou de noite?', options: ['De manhã', 'De noite'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O banho é quente ou frio?', options: ['Frio', 'Quente'], correct: 1, line: 1 },
-        { mode: 'x', text: 'O menino ganha um pato ou um gato?', options: ['Um pato', 'Um gato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Quando o menino toma banho?', options: ['De manhã', 'De noite', 'À tarde'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Como é o banho?', options: ['Frio', 'Quente', 'Azul'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que o menino ganha?', options: ['Um pato', 'Um gato', 'Uma bola'], correct: 0, line: 2 },
         { mode: 'caneta', text: 'Escreva a palavra banho.', expect: 'banho' }
       ]
     },
@@ -397,19 +508,28 @@
       id: 'galinha', level: 'nh', title: 'A galinha', icon: '🐔',
       lines: ['A galinha caminha no caminho.', 'A galinha tem um ninho.', 'A galinha põe o ovo.', 'A Bia cuida da galinha.'],
       questions: [
-        { mode: 'x', text: 'A galinha caminha no caminho ou na sala?', options: ['No caminho', 'Na sala'], correct: 0, line: 0 },
-        { mode: 'x', text: 'A galinha tem um ninho ou uma mala?', options: ['Uma mala', 'Um ninho'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A galinha põe o ovo ou a bola?', options: ['O ovo', 'A bola'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Quem caminha no caminho?', options: ['A galinha', 'O pato', 'A Bia'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que a galinha tem?', options: ['Uma mala', 'Um ninho', 'Uma bola'], correct: 1, line: 1 },
+        { mode: 'x', text: 'O que a galinha põe?', options: ['O ovo', 'A bola', 'A uva'], correct: 0, line: 2 },
         { mode: 'texto', text: 'Quem cuida da galinha?', expect: 'A Bia' }
+      ]
+    },
+    {
+      id: 'lenhador', level: 'nh', title: 'O ninho na manhã', icon: '🪺',
+      lines: ['De manhã, o ninho está quieto.', 'O passarinho canta no ninho.', 'A Lina olha o ninho.', 'Ela não toca no ninho.'],
+      questions: [
+        { mode: 'x', text: 'Quando o ninho está quieto?', options: ['De manhã', 'De noite', 'À tarde'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Quem canta no ninho?', options: ['O gato', 'O passarinho', 'A Lina'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Qual palavra tem NH?', options: ['Gato', 'Bola', 'Ninho'], correct: 2, line: 0 }
       ]
     },
     {
       id: 'chuva', level: 'ch', title: 'A chuva', icon: '🌧️',
       lines: ['A chuva cai no chão.', 'O cachorro corre da chuva.', 'A Lila chama o cachorro.', 'O cachorro entra na sala.'],
       questions: [
-        { mode: 'x', text: 'A chuva cai no chão ou na mesa?', options: ['No chão', 'Na mesa'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O cachorro corre da chuva ou do sol?', options: ['Do sol', 'Da chuva'], correct: 1, line: 1 },
-        { mode: 'x', text: 'A Lila chama o cachorro ou o pato?', options: ['O cachorro', 'O pato'], correct: 0, line: 2 },
+        { mode: 'x', text: 'O que cai no chão?', options: ['A chuva', 'A bola', 'O sol'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Quem corre da chuva?', options: ['O pato', 'O cachorro', 'A Lila'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Qual palavra tem CH?', options: ['Pato', 'Bola', 'Chuva'], correct: 2, line: 0 },
         { mode: 'caneta', text: 'Escreva a palavra chuva.', expect: 'chuva' }
       ]
     },
@@ -417,27 +537,37 @@
       id: 'chave', level: 'ch', title: 'A chave', icon: '🔑',
       lines: ['A Bia perde a chave.', 'A chave está no chapéu.', 'A Bia acha a chave.', 'A Bia abre a porta com a chave.'],
       questions: [
-        { mode: 'x', text: 'A Bia perde a chave ou a bola?', options: ['A bola', 'A chave'], correct: 1, line: 0 },
-        { mode: 'x', text: 'A chave está no chapéu ou na mala?', options: ['No chapéu', 'Na mala'], correct: 0, line: 1 },
-        { mode: 'x', text: 'A Bia acha a chave ou o pato?', options: ['A chave', 'O pato'], correct: 0, line: 2 },
-        { mode: 'x', text: 'A Bia abre a porta com a chave ou com a bola?', options: ['Com a bola', 'Com a chave'], correct: 1, line: 3 }
+        { mode: 'x', text: 'O que a Bia perde?', options: ['A bola', 'A chave', 'A mala'], correct: 1, line: 0 },
+        { mode: 'x', text: 'Onde está a chave?', options: ['No chapéu', 'Na mala', 'Na cama'], correct: 0, line: 1 },
+        { mode: 'x', text: 'Com o que a Bia abre a porta?', options: ['Com a bola', 'Com a chave', 'Com a mão'], correct: 1, line: 3 },
+        { mode: 'x', text: 'Qual palavra tem CH?', options: ['Porta', 'Chave', 'Bola'], correct: 1, line: 0 }
       ]
     },
     {
       id: 'chinelo', level: 'ch', title: 'O chinelo', icon: '👟',
       lines: ['O Duda calça o chinelo.', 'O chinelo é do Duda.', 'O Duda pisa no chão.', 'O chinelo fica na chuva.'],
       questions: [
-        { mode: 'x', text: 'O Duda calça o chinelo ou a bota?', options: ['O chinelo', 'A bota'], correct: 0, line: 0 },
-        { mode: 'x', text: 'O chinelo é do Duda ou da Lila?', options: ['Da Lila', 'Do Duda'], correct: 1, line: 1 },
-        { mode: 'x', text: 'O Duda pisa no chão ou na mesa?', options: ['No chão', 'Na mesa'], correct: 0, line: 2 },
+        { mode: 'x', text: 'Quem calça o chinelo?', options: ['O Duda', 'A Lila', 'A Bia'], correct: 0, line: 0 },
+        { mode: 'x', text: 'De quem é o chinelo?', options: ['Da Lila', 'Do Duda', 'Da Bia'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Onde o Duda pisa?', options: ['No chão', 'Na mesa', 'Na cama'], correct: 0, line: 2 },
         { mode: 'texto', text: 'Onde o chinelo fica?', expect: 'Na chuva' }
+      ]
+    },
+    {
+      id: 'chaleira', level: 'ch', title: 'A chaleira', icon: '🫖',
+      lines: ['A chaleira está no fogão.', 'A água ferve na chaleira.', 'A mãe faz o chá.', 'O cheiro do chá enche a casa.'],
+      questions: [
+        { mode: 'x', text: 'Onde está a chaleira?', options: ['No fogão', 'Na cama', 'Na rua'], correct: 0, line: 0 },
+        { mode: 'x', text: 'O que ferve na chaleira?', options: ['O leite', 'A água', 'O suco'], correct: 1, line: 1 },
+        { mode: 'x', text: 'Quem faz o chá?', options: ['A mãe', 'O Duda', 'A Bia'], correct: 0, line: 2 },
+        { mode: 'caneta', text: 'Escreva a palavra chá.', expect: 'chá' }
       ]
     },
     {
       id: 'teste-jeitos', level: 'teste', title: 'Os três jeitos de responder', icon: '✏️',
       lines: ['A Bia ama o gato.', 'O gato mia na sala.'],
       questions: [
-        { mode: 'x', text: 'A Bia ama o gato ou o sapo?', options: ['O gato', 'O sapo'], correct: 0, line: 0 },
+        { mode: 'x', text: 'Quem ama o gato?', options: ['A Bia', 'O sapo', 'A bola'], correct: 0, line: 0 },
         { mode: 'texto', text: 'Quem ama o gato?', expect: 'A Bia' },
         { mode: 'caneta', text: 'Escreva a palavra gato.', expect: 'gato' }
       ]
@@ -480,6 +610,7 @@
   let adultMarks = [];
   let viewStory = false;
   let savedThisRound = false;
+  let exportDoneFlag = false;
   let audioCtx = null;
 
   const escapeText = (str) => String(str ?? '').replace(/[&<>"']/g, (ch) => ({
@@ -507,7 +638,8 @@
       activityId: current ? current.id : null,
       questionIndex,
       viewStory,
-      savedThisRound
+      savedThisRound,
+      exportDoneFlag
     };
   }
   function restore(state) {
@@ -517,6 +649,7 @@
       current = null;
       questionIndex = 0;
       viewStory = false;
+      exportDoneFlag = false;
       render();
       moveTop();
       return;
@@ -527,7 +660,8 @@
     questionIndex = typeof state.questionIndex === 'number' ? state.questionIndex : 0;
     viewStory = !!state.viewStory;
     savedThisRound = !!state.savedThisRound;
-    if ((stage === 'read' || stage === 'quiz' || stage === 'adult' || stage === 'result') && !current) {
+    exportDoneFlag = !!state.exportDoneFlag;
+    if ((stage === 'read' || stage === 'quiz' || stage === 'adult' || stage === 'result' || stage === 'export') && !current) {
       stage = levelId ? 'level' : 'home';
     }
     if ((stage === 'quiz' || stage === 'adult' || stage === 'result') && current && (!answers.length || answers.length !== current.questions.length)) {
@@ -560,6 +694,12 @@
     syncDom();
     if (stage === 'quiz' && questionIndex > 0) {
       questionIndex -= 1;
+      render();
+      moveTop();
+      return;
+    }
+    if (stage === 'export') {
+      stage = exportDoneFlag ? 'result' : 'read';
       render();
       moveTop();
       return;
@@ -729,6 +869,7 @@
     else if (stage === 'quiz') renderQuiz();
     else if (stage === 'adult') renderAdult();
     else if (stage === 'result') renderResult();
+    else if (stage === 'export') renderExport();
   }
 
   function renderHome() {
@@ -808,7 +949,7 @@
     bindReadingTools();
     const start = app.querySelector('#startQuiz');
     if (start) start.addEventListener('click', () => navigate(() => { stage = 'quiz'; questionIndex = 0; }));
-    app.querySelector('#exportBlank').addEventListener('click', () => downloadSheet(false));
+    app.querySelector('#exportBlank').addEventListener('click', () => openExport(false));
     app.querySelector('#backLevel').addEventListener('click', goBack);
   }
 
@@ -1188,7 +1329,7 @@
         stage = 'read';
       });
     });
-    app.querySelector('#exportDone').addEventListener('click', () => downloadSheet(true));
+    app.querySelector('#exportDone').addEventListener('click', () => openExport(true));
     app.querySelector('#backLevel').addEventListener('click', goBack);
   }
 
@@ -1234,56 +1375,147 @@
     }
     return `<section class="q ${ok ? 'good' : 'bad'}"><h2>${i + 1}. ${escapeText(q.text)}</h2>${media}<p>${detail}</p></section>`;
   }
-  function downloadSheet(done) {
+  function sheetInnerHtml(done) {
     const level = levelById(current.level);
     const total = current.questions.length;
     const score = done ? scoreOf() : 0;
-    const title = done ? `${current.title} — tarefa feita` : `${current.title} — em branco`;
     const questions = current.questions.map((q, i) => (done ? sheetQuestionDone(q, i) : sheetQuestionBlank(q, i))).join('');
     const lines = current.lines.map((line, i) => `<p><span>${i + 1}</span>${escapeText(line)}</p>`).join('');
     const head = done
       ? `<p class="score">${score} de ${total} acertos</p><p class="who">Nome: <i></i> &nbsp;&nbsp; Data: ${escapeText(sheetWhen())}</p>`
       : '<p class="who">Nome: <i></i> &nbsp;&nbsp; Data: <i></i></p>';
-    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeText(title)}</title><style>
-      body{margin:0;background:#f8f8f2;color:#22313a;font-family:Verdana,Arial,sans-serif}
-      main{max-width:760px;margin:auto;padding:28px 20px 48px}
-      h1{font-size:28px;letter-spacing:-.6px;margin:8px 0}
-      .kicker{color:#285f82;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
-      .who{color:#61717c;font-size:15px}
-      .who i{display:inline-block;width:180px;border-bottom:1px solid #9aa9ac;height:1.1em;vertical-align:bottom}
-      .score{font-size:22px;font-weight:900;margin:8px 0}
-      .story p{display:flex;gap:12px;border:1px solid #dee6e9;border-radius:12px;padding:12px 14px;background:#fff;font-size:20px;font-weight:700;line-height:1.4}
-      .story span{color:#9aa9ac;width:22px;flex:none}
-      .q{background:#fff;border:1px solid #dee6e9;border-radius:14px;padding:14px 16px;margin-top:12px}
-      .q h2{font-size:18px;margin:0 0 10px}
-      .q.good{background:#e8f6ee;border-color:#d0e7d8}
-      .q.bad{background:#fff0ee;border-color:#f3d8d3}
-      .opt{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin:8px 0}
-      .box{width:22px;height:22px;border:2px solid #22313a;border-radius:4px;flex:none}
-      .lines span{display:block;border-bottom:1px solid #9aa9ac;height:34px}
-      .write-box{height:160px;border:2px solid #cfdbdf;border-radius:12px;background:#fff}
-      img{max-width:100%;background:#fff;border:1px solid #dee6e9;border-radius:12px}
-      .foot{color:#7e8c90;font-size:12px;margin-top:22px}
-      @media print{body{background:#fff}main{padding:0}.q,.story p{break-inside:avoid}}
-    </style></head><body><main>
+    return `
       <div class="kicker">Hora de Ler${level ? ` · ${escapeText(level.title)}` : ''}</div>
       <h1>${escapeText(current.title)}</h1>
       ${head}
       <div class="story">${lines}</div>
       ${questions}
-      <p class="foot">${done ? 'Tarefa feita, guardada neste arquivo.' : 'Tarefa em branco, para imprimir ou fazer no papel.'}</p>
-    </main></body></html>`;
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      <p class="foot">${done ? 'Tarefa feita.' : 'Tarefa em branco, para imprimir ou fazer no papel.'}</p>`;
+  }
+  function openExport(done) {
+    navigate(() => {
+      exportDoneFlag = !!done;
+      stage = 'export';
+    });
+  }
+  function renderExport() {
+    const done = exportDoneFlag;
+    app.innerHTML = `<div class="panel">
+      <div class="eyebrow">${done ? 'Tarefa feita' : 'Tarefa em branco'}</div>
+      <h1 class="stage-title">Prévia para exportar</h1>
+      <p class="helper">Veja a folha. Depois escolha imprimir, salvar imagem ou salvar PDF.</p>
+      <div class="export-actions">
+        <button type="button" class="primary" id="printSheet">Imprimir</button>
+        <button type="button" class="secondary" id="imageSheet">Exportar imagem</button>
+        <button type="button" class="secondary" id="pdfSheet">Exportar PDF</button>
+        <button type="button" class="secondary" id="backExport">← Voltar</button>
+      </div>
+      <div class="sheet-paper" id="sheetPaper">${sheetInnerHtml(done)}</div>
+    </div>`;
+    app.querySelector('#printSheet').addEventListener('click', () => window.print());
+    app.querySelector('#imageSheet').addEventListener('click', () => exportSheetFile('png'));
+    app.querySelector('#pdfSheet').addEventListener('click', () => exportSheetFile('pdf'));
+    app.querySelector('#backExport').addEventListener('click', goBack);
+  }
+  function loadHtml2Canvas() {
+    if (window.html2canvas) return Promise.resolve(window.html2canvas);
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-h2c]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(window.html2canvas));
+        existing.addEventListener('error', reject);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.dataset.h2c = '1';
+      script.onload = () => resolve(window.html2canvas);
+      script.onerror = () => reject(new Error('Não foi possível carregar a captura.'));
+      document.head.appendChild(script);
+    });
+  }
+  async function captureSheetCanvas() {
+    const paper = document.getElementById('sheetPaper');
+    const html2canvas = await loadHtml2Canvas();
+    return html2canvas(paper, {
+      backgroundColor: '#ffffff',
+      scale: Math.min(2, window.devicePixelRatio || 2),
+      useCORS: true,
+      logging: false
+    });
+  }
+  function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = done
-      ? `hora-de-ler-${current.id}-feita-${sheetStamp()}.html`
-      : `hora-de-ler-${current.id}-em-branco.html`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+  function canvasToPdfBlob(canvas) {
+    const jpeg = canvas.toDataURL('image/jpeg', 0.92);
+    const bin = atob(jpeg.split(',')[1]);
+    const imgBytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) imgBytes[i] = bin.charCodeAt(i);
+    const pageW = 595.28;
+    const pageH = 841.89;
+    const margin = 28;
+    const maxW = pageW - margin * 2;
+    const maxH = pageH - margin * 2;
+    const scale = Math.min(maxW / canvas.width, maxH / canvas.height);
+    const drawW = canvas.width * scale;
+    const drawH = canvas.height * scale;
+    const x = (pageW - drawW) / 2;
+    const y = pageH - margin - drawH;
+    const content = `q ${drawW.toFixed(2)} 0 0 ${drawH.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /Im0 Do Q`;
+    const enc = new TextEncoder();
+    const parts = [];
+    const offsets = [0];
+    let cursor = 0;
+    const push = (chunk) => {
+      parts.push(chunk);
+      cursor += typeof chunk === 'string' ? enc.encode(chunk).length : chunk.length;
+    };
+    const beginObj = () => { offsets.push(cursor); };
+    push('%PDF-1.4\n');
+    beginObj();
+    push(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`);
+    beginObj();
+    push(`2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n`);
+    beginObj();
+    push(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Contents 4 0 R /Resources << /XObject << /Im0 5 0 R >> >> >>\nendobj\n`);
+    beginObj();
+    push(`4 0 obj\n<< /Length ${enc.encode(content).length} >>\nstream\n${content}\nendstream\nendobj\n`);
+    beginObj();
+    push(`5 0 obj\n<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\nstream\n`);
+    push(imgBytes);
+    push(`\nendstream\nendobj\n`);
+    const xrefStart = cursor;
+    let xref = `xref\n0 6\n0000000000 65535 f \n`;
+    for (let i = 1; i <= 5; i += 1) xref += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+    push(xref);
+    push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+    return new Blob(parts, { type: 'application/pdf' });
+  }
+  async function exportSheetFile(kind) {
+    const panel = app.querySelector('.panel');
+    try {
+      if (panel) panel.classList.add('export-busy');
+      const canvas = await captureSheetCanvas();
+      const base = `hora-de-ler-${current.id}-${exportDoneFlag ? 'feita' : 'em-branco'}-${sheetStamp()}`;
+      if (kind === 'png') {
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        downloadBlob(blob, `${base}.png`);
+      } else {
+        downloadBlob(canvasToPdfBlob(canvas), `${base}.pdf`);
+      }
+    } catch (err) {
+      window.alert('Não deu para gerar o arquivo agora. Confira a internet na primeira vez ou use Imprimir e salve como PDF.');
+    } finally {
+      if (panel) panel.classList.remove('export-busy');
+    }
   }
 
   function openLevel(id) {
